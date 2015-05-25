@@ -2,7 +2,6 @@ package io.swagger.client.model;
 
 import io.swagger.client.model.ScopeEntry;
 import java.util.*;
-import io.swagger.client.model.Date-time;
 
 import com.wordnik.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @ApiModel(description = "")
 public class BlacklistParams  {
   
-  private Date-time activeFrom = null;
-  private Date-time activeTo = null;
+  private Date activeFrom = null;
+  private Date activeTo = null;
   private String entityType = null;
   private List<String> ids = new ArrayList<String>() ;
   private Boolean disabled = null;
@@ -26,10 +25,10 @@ public class BlacklistParams  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("activeFrom")
-  public Date-time getActiveFrom() {
+  public Date getActiveFrom() {
     return activeFrom;
   }
-  public void setActiveFrom(Date-time activeFrom) {
+  public void setActiveFrom(Date activeFrom) {
     this.activeFrom = activeFrom;
   }
 
@@ -38,10 +37,10 @@ public class BlacklistParams  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("activeTo")
-  public Date-time getActiveTo() {
+  public Date getActiveTo() {
     return activeTo;
   }
-  public void setActiveTo(Date-time activeTo) {
+  public void setActiveTo(Date activeTo) {
     this.activeTo = activeTo;
   }
 

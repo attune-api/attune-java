@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 
-public class FixThisApi {
+public class AttuneRankingApi {
   String basePath = "https://api.attune-staging.co"; //"http://localhost/";
   ApiInvoker apiInvoker = ApiInvoker.getInstance();
 

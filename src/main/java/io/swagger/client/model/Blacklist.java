@@ -1,7 +1,6 @@
 package io.swagger.client.model;
 
 import java.util.*;
-import io.swagger.client.model.Date-time;
 
 import com.wordnik.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,10 +15,10 @@ public class Blacklist  {
   private List<String> ids = new ArrayList<String>() ;
   private String consumer = null;
   private String entityType = null;
-  private Date-time startDate = null;
-  private Date-time endDate = null;
-  private Date-time createdDate = null;
-  private Date-time updatedDate = null;
+  private Date startDate = null;
+  private Date endDate = null;
+  private Date createdDate = null;
+  private Date updatedDate = null;
   private String scope = null;
   private Boolean disabled = null;
   private String id = null;
@@ -65,10 +64,10 @@ public class Blacklist  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("startDate")
-  public Date-time getStartDate() {
+  public Date getStartDate() {
     return startDate;
   }
-  public void setStartDate(Date-time startDate) {
+  public void setStartDate(Date startDate) {
     this.startDate = startDate;
   }
 
@@ -77,10 +76,10 @@ public class Blacklist  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("endDate")
-  public Date-time getEndDate() {
+  public Date getEndDate() {
     return endDate;
   }
-  public void setEndDate(Date-time endDate) {
+  public void setEndDate(Date endDate) {
     this.endDate = endDate;
   }
 
@@ -89,10 +88,10 @@ public class Blacklist  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("createdDate")
-  public Date-time getCreatedDate() {
+  public Date getCreatedDate() {
     return createdDate;
   }
-  public void setCreatedDate(Date-time createdDate) {
+  public void setCreatedDate(Date createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -101,10 +100,10 @@ public class Blacklist  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("updatedDate")
-  public Date-time getUpdatedDate() {
+  public Date getUpdatedDate() {
     return updatedDate;
   }
-  public void setUpdatedDate(Date-time updatedDate) {
+  public void setUpdatedDate(Date updatedDate) {
     this.updatedDate = updatedDate;
   }
 
