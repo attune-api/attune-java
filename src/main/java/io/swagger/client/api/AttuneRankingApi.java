@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class FixThisApi {
-  String basePath = "http://localhost/";
+  String basePath = "https://api.attune-staging.co"; //"http://localhost/";
   ApiInvoker apiInvoker = ApiInvoker.getInstance();
 
   public ApiInvoker getInvoker() {
