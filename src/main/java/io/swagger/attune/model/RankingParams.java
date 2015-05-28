@@ -1,6 +1,5 @@
-package io.swagger.client.model;
+package io.swagger.attune.model;
 
-import io.swagger.client.model.ScopeEntry;
 import java.util.*;
 
 import com.wordnik.swagger.annotations.*;

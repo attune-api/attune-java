@@ -1,5 +1,6 @@
-package io.swagger.client.api;
+package io.swagger.attune;
 
+import io.swagger.attune.api.Anonymous;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
@@ -7,13 +8,14 @@ import org.junit.After;
 import static org.junit.Assert.*;
 
 /**
- * AttuneRankingApi Tester.
+ * Anonymous Tester.
  *
  * @author <sudnya>
- * @since <pre>May 25, 2015</pre>
+ * @since <pre>May 26, 2015</pre>
  * @version 1.0
  */
-public class AttuneRankingApiTest {
+
+public class AnonymousTest {
 
     @Before
     public void before() throws Exception {
@@ -28,8 +30,7 @@ public class AttuneRankingApiTest {
      */
     @Test
     public void testAnonymousCreate() throws Exception {
-        AttuneRankingApi attuneRankingApi = new AttuneRankingApi();
-        assertNotNull(attuneRankingApi.create());
+        Anonymous anonymous = new Anonymous();
     }
 
 }

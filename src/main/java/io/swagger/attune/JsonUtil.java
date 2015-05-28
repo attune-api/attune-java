@@ -1,4 +1,4 @@
-package io.swagger.client;
+package io.swagger.attune;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;

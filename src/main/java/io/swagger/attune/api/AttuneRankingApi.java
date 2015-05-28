@@ -1,31 +1,23 @@
-package io.swagger.client.api;
+package io.swagger.attune.api;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.ApiInvoker;
+import io.swagger.attune.ApiInvoker;
+import io.swagger.attune.ApiException;
 
-import io.swagger.client.model.*;
-
-import java.util.*;
-
-import io.swagger.client.model.AnonymousResult;
-import io.swagger.client.model.Customer;
-import io.swagger.client.model.BlacklistUpdateResponse;
-import io.swagger.client.model.RankingParams;
-import io.swagger.client.model.RankedEntities;
-import io.swagger.client.model.BatchRankingRequest;
-import io.swagger.client.model.BatchRankingResult;
-import io.swagger.client.model.BlacklistGetResponse;
-import io.swagger.client.model.BlacklistSaveResponse;
-import io.swagger.client.model.BlacklistParams;
-import io.swagger.client.model.Blacklist;
-import io.swagger.client.model.BlacklistDeleteResponse;
+import io.swagger.attune.model.AnonymousResult;
+import io.swagger.attune.model.Customer;
+import io.swagger.attune.model.BlacklistUpdateResponse;
+import io.swagger.attune.model.RankingParams;
+import io.swagger.attune.model.RankedEntities;
+import io.swagger.attune.model.BatchRankingRequest;
+import io.swagger.attune.model.BatchRankingResult;
+import io.swagger.attune.model.BlacklistGetResponse;
+import io.swagger.attune.model.BlacklistSaveResponse;
+import io.swagger.attune.model.BlacklistParams;
+import io.swagger.attune.model.Blacklist;
+import io.swagger.attune.model.BlacklistDeleteResponse;
 
 import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
 
-import javax.ws.rs.core.MediaType;
-
-import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 

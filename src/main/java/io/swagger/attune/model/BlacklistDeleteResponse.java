@@ -1,4 +1,4 @@
-package io.swagger.client.model;
+package io.swagger.attune.model;
 
 
 import com.wordnik.swagger.annotations.*;
@@ -9,10 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  **/
 @ApiModel(description = "")
-public class BlacklistSaveResponse  {
+public class BlacklistDeleteResponse  {
   
   private String result = null;
-  private String id = null;
 
   
   /**
@@ -27,26 +26,13 @@ public class BlacklistSaveResponse  {
   }
 
   
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("id")
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  
 
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BlacklistSaveResponse {\n");
+    sb.append("class BlacklistDeleteResponse {\n");
     
     sb.append("  result: ").append(result).append("\n");
-    sb.append("  id: ").append(id).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

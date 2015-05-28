@@ -1,4 +1,4 @@
-package io.swagger.client.model;
+package io.swagger.attune.model;
 
 import java.util.*;
 

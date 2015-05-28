@@ -1,7 +1,6 @@
-package io.swagger.client.model;
+package io.swagger.attune.model;
 
 import java.util.*;
-import io.swagger.client.model.RankedEntities;
 
 import com.wordnik.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;

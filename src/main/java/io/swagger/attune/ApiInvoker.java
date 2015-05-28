@@ -1,20 +1,14 @@
-package io.swagger.client;
+package io.swagger.attune;
 
-import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.multipart.FormDataMultiPart;
 
 import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.core.MediaType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,7 +23,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 public class ApiInvoker {
   private static ApiInvoker INSTANCE = new ApiInvoker();

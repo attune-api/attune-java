@@ -1,4 +1,4 @@
-package io.swagger.client;
+package io.swagger.attune;
 
 public class ApiException extends Exception {
   int code = 0;
