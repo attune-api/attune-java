@@ -27,6 +27,7 @@ public class AttuneClientTest {
 
     /**
      * Method: get auth token
+     * @throws Exception
      */
     @Test
     public void testAuthTokenGet() throws Exception {
@@ -34,6 +35,10 @@ public class AttuneClientTest {
         assertNotNull(client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66"));
     }
 
+    /**
+     * Method: test a anonymous get request
+     * @throws Exception
+     */
     @Test
     public void testAnonymousCreate() throws Exception {
         AttuneClient client = new AttuneClient();
