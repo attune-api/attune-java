@@ -9,6 +9,7 @@ import io.swagger.attune.api.Anonymous;
 import io.swagger.attune.api.Entities;
 import io.swagger.attune.model.AnonymousResult;
 import io.swagger.attune.model.Customer;
+import io.swagger.attune.model.RankedEntities;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -45,7 +46,6 @@ public class AttuneClient {
      * @param clientId and clientSecret
      * @return An auth token
      */
-
     public String getAuthToken(String clientId, String clientSecret) throws ApiException {
         if (clientId == null)
             throw new IllegalArgumentException("clientId is required");
@@ -74,11 +74,49 @@ public class AttuneClient {
         }
     }
 
-    public AnonymousResult createAnonymous(String accessToken) throws ApiException {
-        return anonymous.create(accessToken);
+
+    /**
+     * Requests an anonymous id, given an auth token
+     * @author sudnya
+     * @example
+     * String token = attuneClient.createAnonymous(authToken)
+     * @param authToken
+     * @return An AnonymousResult object, do a getId on this object to get anonymousId
+     */
+    public AnonymousResult createAnonymous(String authToken) throws ApiException {
+        return anonymous.create(authToken);
     }
 
-    public Customer getBinding(String anonymousId, String authToken) throws ApiException {
+    /**
+     */
+    /**
+     * Requests an anonymous id, given an auth token
+     * @author sudnya
+     * @example
+     * String token = attuneClient.createAnonymous(authToken)
+     * Binds one actor to another.
+     * Binds one actor to another, allowing activities of those actors to be shared between the two.
+     * @param anonymous anonymous
+     * @param request request
+     * @return BlacklistUpdateResponse
+     */
+    public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
+        Customer customer = new Customer();
+        customer.setCustomer(customerId);
+        anonymous.update(anonymousId, customer, authToken);
+    }
+
+
+    /**
+     * Binds an anonymous id to a customer, given an auth token
+     * @author sudnya
+     * @example
+     * String token = attuneClient.getBinding(anonymousId, authToken)
+     * @param authToken
+     * @return An AnonymousResult object, do a getId on this object to get anonymousId
+     */
+    public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
         return anonymous.get(anonymousId, authToken);
     }
+
 }

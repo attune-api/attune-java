@@ -136,7 +136,7 @@ public class Anonymous {
      * @param request request
      * @return BlacklistUpdateResponse
      */
-    public BlacklistUpdateResponse update (String anonymous, Customer request) throws ApiException {
+    public BlacklistUpdateResponse update (String anonymous, Customer request, String accessToken) throws ApiException {
         Object postBody = request;
 
 
@@ -148,6 +148,7 @@ public class Anonymous {
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
         Map<String, String> formParams = new HashMap<String, String>();
+        queryParams.put("access_token", accessToken);
 
 
 
@@ -170,7 +171,11 @@ public class Anonymous {
 
         try {
             String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType);
-            if(response != null){
+            if(response.equals("")) {
+                BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
+                blacklistResponse.setResult(response);
+                return blacklistResponse;
+            } else if(response != null) {
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
             else {

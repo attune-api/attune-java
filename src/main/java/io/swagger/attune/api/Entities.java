@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by sudnya on 5/26/15.
  */
 public class Entities {
-    String basePath = "https://api.attune-staging.co"; //"http://localhost/";
+    String basePath = "https://api.attune-staging.co";
     ApiInvoker apiInvoker = ApiInvoker.getInstance();
 
     public ApiInvoker getInvoker() {

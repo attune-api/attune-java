@@ -179,7 +179,11 @@ public class AttuneRankingApi {
 
     try {
       String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType);
-      if(response != null){
+      if(response.equals("")) {
+          BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
+          blacklistResponse.setResult(response);
+          return blacklistResponse;
+      } else if(response != null){
         return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
       }
       else {
