@@ -10,6 +10,7 @@ import io.swagger.attune.api.Entities;
 import io.swagger.attune.model.AnonymousResult;
 import io.swagger.attune.model.Customer;
 import io.swagger.attune.model.RankedEntities;
+import io.swagger.attune.model.RankingParams;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -119,4 +120,13 @@ public class AttuneClient {
         return anonymous.get(anonymousId, authToken);
     }
 
+    /**
+     * Returns a ranking of the specified entities for the current user, given an auth token
+     * @author sudnya
+     * @example
+     *
+     */
+    public RankedEntities getRankings(RankingParams rankingParams, String authToken) throws ApiException {
+        return entities.getRankings(rankingParams, authToken);
+    }
 }
