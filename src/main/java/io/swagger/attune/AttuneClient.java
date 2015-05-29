@@ -5,7 +5,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.wordnik.swagger.annotations.Api;
 import io.swagger.attune.api.Anonymous;
 import io.swagger.attune.api.Entities;
 import io.swagger.attune.model.AnonymousResult;
@@ -79,7 +78,7 @@ public class AttuneClient {
         return anonymous.create(accessToken);
     }
 
-    public Customer getBinding(String anonymousId) throws ApiException {
-        return anonymous.get(anonymousId);
+    public Customer getBinding(String anonymousId, String authToken) throws ApiException {
+        return anonymous.get(anonymousId, authToken);
     }
 }

@@ -38,3 +38,10 @@ dependencies {
     // 'test.useTestNG()' to your build script.
     testCompile 'junit:junit:4.11'
 }
+
+test {
+    testLogging {
+        events 'started', 'passed'
+        testLogging.showStandardStreams = true
+    }
+}

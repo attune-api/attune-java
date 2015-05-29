@@ -83,7 +83,7 @@ public class Anonymous {
      * @param anonymous anonymous
      * @return Customer
      */
-    public Customer get (String anonymous) throws ApiException {
+    public Customer get (String anonymous, String accessToken) throws ApiException {
         Object postBody = null;
 
 
@@ -95,6 +95,7 @@ public class Anonymous {
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
         Map<String, String> formParams = new HashMap<String, String>();
+        queryParams.put("access_token", accessToken);
 
 
 
