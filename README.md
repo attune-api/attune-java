@@ -6,11 +6,16 @@ A client for the [Attune ranking API](http://attune.co/).
 * [Documentation] (https://github.com/attune-api/attune-java/blob/master/javadoc/index.html)
 
 ## Installation
+
 Build a jar file using:
+```groovy
 gradle jar
+```
 
 The jar file is created at:
+```
 build/libs/attune-java.jar
+```
 
 Copy this jar to the build/libs folder of your project and import it.
 
