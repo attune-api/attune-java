@@ -19,18 +19,18 @@ Copy this jar to the build/libs folder of your project and import it.
 ### Example usage
 
 Requests are performed through a AttuneClient object
-```
+```java
   AttuneClient attuneClient = new AttuneClient();
 ```
 
 Visitors to the application should be tagged with an anonymous user id
-```
+```java
   AnonymousResult anonoymous = client.createAnonymous(authToken);
   System.out.println("Created anonymous user with id: " + anonymous.getId());
 ```
 
 The user id can be bound to a customer id at login
-```
+```java
   AttuneClient client        = new AttuneClient();
   String authToken           = attuneClient.getAuthToken(clientId, clientSecret);
   AnonymousResult anonoymous = client.createAnonymous(authToken);
@@ -41,7 +41,7 @@ The user id can be bound to a customer id at login
 ```
 The client can then perform rankings
 
-```
+```java
   RankingParams rankingParams = new RankingParams();
   
   rankingParams.setAnonymous(anonymous.getId());
@@ -60,7 +60,7 @@ The client can then perform rankings
 ```
 
 The client provides a way to request a new auth_token through the API
-```
+```java
   AttuneClient attuneClient = new AttuneClient();
   String authToken          = attuneClient.getAuthToken(clientId, clientSecret);
 ```
