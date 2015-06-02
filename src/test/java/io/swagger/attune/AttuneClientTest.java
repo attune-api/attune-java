@@ -38,7 +38,7 @@ public class AttuneClientTest {
      * @throws Exception
      */
     @Test
-    public void testAuthTokenGet() throws Exception {
+    public void testAuthGetToken() throws Exception {
         long sleepSeconds = 30;
         System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds*1000L);
@@ -49,13 +49,12 @@ public class AttuneClientTest {
         System.out.println("PASS: authToken not null");
     }
 
-
     /**
      * Method: test a anonymous get request
      * @throws Exception
      */
     @Test
-    public void testAnonymousCreate() throws Exception {
+    public void testCreateAnonymous() throws Exception {
         long sleepSeconds = 30;
         System.out.println("testAnonymousCreate: Sleep for  " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
@@ -75,7 +74,7 @@ public class AttuneClientTest {
      * @throws Exception
      */
     @Test
-    public void testBindCall() throws Exception {
+    public void testBind() throws Exception {
         long sleepSeconds = 30;
 
         System.out.println("testBind: Sleep for  " + sleepSeconds + "  seconds to not overwhelm api server with requests");
@@ -101,7 +100,7 @@ public class AttuneClientTest {
      * @throws Exception
      */
     @Test
-    public void testBoundCustomer() throws Exception {
+    public void testGetBoundCustomer() throws Exception {
         long sleepSeconds      = 30;
         AttuneClient client    = new AttuneClient();
 

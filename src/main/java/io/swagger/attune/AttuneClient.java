@@ -5,12 +5,14 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import io.swagger.attune.api.Anonymous;
 import io.swagger.attune.api.Entities;
 import io.swagger.attune.model.AnonymousResult;
 import io.swagger.attune.model.Customer;
 import io.swagger.attune.model.RankedEntities;
 import io.swagger.attune.model.RankingParams;
+
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -20,12 +22,13 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * Created by sudnya on 5/27/15.
  */
-public class AttuneClient {
+public class AttuneClient implements RankingClient  {
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
 
-    /**
+    //TODO set configurable parameters
+    /*
      * Initializes a new AttuneClient
      * @author sudnya
      * Client attuneClient = new AttuneClient(endPoint, timeout);
@@ -44,7 +47,8 @@ public class AttuneClient {
      * @author sudnya
      * @example
      * String token = attuneClient.getAuthToken(clientId, clientSecret)
-     * @param clientId and clientSecret
+     * @param clientId the client id string
+     * @param clientSecret the client secret bearer string
      * @return An auth token
      */
     public String getAuthToken(String clientId, String clientSecret) throws ApiException {
@@ -81,7 +85,7 @@ public class AttuneClient {
      * @author sudnya
      * @example
      * String token = attuneClient.createAnonymous(authToken)
-     * @param authToken
+     * @param authToken authentication token
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
@@ -97,8 +101,9 @@ public class AttuneClient {
      * String token = attuneClient.createAnonymous(authToken)
      * Binds one actor to another.
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
-     * @param anonymous anonymous
-     * @param request request
+     * @param anonymousId anonymousId
+     * @param customerId customerId
+     * @param authToken authentication token
      * @return BlacklistUpdateResponse
      */
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
@@ -113,7 +118,8 @@ public class AttuneClient {
      * @author sudnya
      * @example
      * String token = attuneClient.getBinding(anonymousId, authToken)
-     * @param authToken
+     * @param anonymousId anonymousId
+     * @param authToken authentication token
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
@@ -124,7 +130,9 @@ public class AttuneClient {
      * Returns a ranking of the specified entities for the current user, given an auth token
      * @author sudnya
      * @example
-     *
+     * RankedEntities rankings = client.getRankings(rankingParams, authToken)
+     * @param rankingParams an object with the ranking parameters
+     * @param authToken authentication token
      */
     public RankedEntities getRankings(RankingParams rankingParams, String authToken) throws ApiException {
         return entities.getRankings(rankingParams, authToken);
