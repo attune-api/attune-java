@@ -70,6 +70,21 @@ The client provides a way to request a new auth_token through the API
   String authToken          = attuneClient.getAuthToken(clientId, clientSecret);
 ```
 
+### Testing
+
+For testing and development, the ranking API can be simulated using.
+
+``` java
+  
+  boolean isTestMode   = true;
+  Attune attune        = new Attune(isTestMode);
+  RankingClient client = attune.getAttuneClient();
+  
+```
+
+In this mode no API calls will be made, and rankings will be returned in their original order.
+
+
 ## Contributing
 
 1. Fork it ( http://github.com/attune-api/attune-java/fork )
