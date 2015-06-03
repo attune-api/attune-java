@@ -1,6 +1,6 @@
-import io.swagger.attune.AttuneClient;
-import io.swagger.attune.MockClient;
-import io.swagger.attune.RankingClient;
+import attune.client.AttuneClient;
+import attune.client.MockClient;
+import attune.client.RankingClient;
 
 /**
  * Created by sudnya on 5/27/15.
