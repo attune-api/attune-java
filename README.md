@@ -88,10 +88,6 @@ retries=4
 
 Settings can also be overridden by modifying the config.properties file
 
-``` ruby
-client = Attune::Client.new(auth_token: "my-secure-auth-token", timeout: 2)
-```
-
 ### Testing
 
 For testing and development, the ranking API can be simulated using.
