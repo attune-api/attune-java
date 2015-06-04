@@ -70,6 +70,28 @@ The client provides a way to request a new auth_token through the API
   String authToken    = attuneClient.getAuthToken();
 ```
 
+### Configuration
+
+Attune can be configured globally via setting properties in the config.properties file of the project
+
+``` java
+
+end_point=https://api.attune-staging.co
+timeout=5
+client_id=client-id
+client_secret=client-secret
+logging_enabled=true
+test_mode=true
+retries=4
+
+```
+
+Settings can also be overridden by modifying the config.properties file
+
+``` ruby
+client = Attune::Client.new(auth_token: "my-secure-auth-token", timeout: 2)
+```
+
 ### Testing
 
 For testing and development, the ranking API can be simulated using.
