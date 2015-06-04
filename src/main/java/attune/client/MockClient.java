@@ -9,7 +9,7 @@ import attune.client.model.RankedEntities;
  * Created by sudnya on 6/2/15.
  */
 public class MockClient implements RankingClient {
-    public String getAuthToken(String clientId, String clientSecret) throws ApiException {
+    public String getAuthToken() throws ApiException {
         return "";
     }
 

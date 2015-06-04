@@ -41,11 +41,11 @@ public class AttuneClientTest {
     public void testAuthGetToken() throws Exception {
         long sleepSeconds = 30;
         System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
-        //Thread.sleep(sleepSeconds*1000L);
+        Thread.sleep(sleepSeconds*1000L);
 
         AttuneClient client = new AttuneClient();
 
-        assertNotNull(client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66"));
+        assertNotNull(client.getAuthToken());
         System.out.println("PASS: authToken not null");
     }
 
@@ -60,7 +60,7 @@ public class AttuneClientTest {
         Thread.sleep(sleepSeconds * 1000L);
 
         AttuneClient client = new AttuneClient();
-        String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        String authToken    = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -81,7 +81,7 @@ public class AttuneClientTest {
         Thread.sleep(sleepSeconds * 1000L);
 
         AttuneClient client       = new AttuneClient();
-        String authToken          = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        String authToken          = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -107,7 +107,7 @@ public class AttuneClientTest {
         System.out.println("testBoundCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        String authToken       = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -138,7 +138,7 @@ public class AttuneClientTest {
         System.out.println("testBoundToCorrectCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        String authToken       = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -180,7 +180,7 @@ public class AttuneClientTest {
         System.out.println("testGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        String authToken       = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 

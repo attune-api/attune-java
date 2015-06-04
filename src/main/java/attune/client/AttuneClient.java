@@ -27,19 +27,16 @@ public class AttuneClient implements RankingClient  {
     private Entities entities;
     private Anonymous anonymous;
 
-    //TODO set configurable parameters
-    /*
+    /**
      * Initializes a new AttuneClient
      * @author sudnya
-     * Client attuneClient = new AttuneClient(endPoint, timeout);
-     * @param Options for connection (see AttuneConfigurable)
-     * @return A new client object
+     * @return A new client object with configuration parameters loaded from the config.properties file
      */
 
     public AttuneClient() {
         attuneConfigurable = new AttuneDefault();
-        entities  = new Entities();
-        anonymous = new Anonymous();
+        entities           = new Entities();
+        anonymous          = new Anonymous();
     }
 
     /**
@@ -47,11 +44,12 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @example
      * String token = attuneClient.getAuthToken(clientId, clientSecret)
-     * @param clientId the client id string
-     * @param clientSecret the client secret bearer string
      * @return An auth token
      */
-    public String getAuthToken(String clientId, String clientSecret) throws ApiException {
+    public String getAuthToken() throws ApiException {
+        String clientId     = attuneConfigurable.getClientId();
+        String clientSecret = attuneConfigurable.getClientSecret();
+
         if (clientId == null)
             throw new IllegalArgumentException("clientId is required");
         if (clientSecret == null)

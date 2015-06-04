@@ -33,7 +33,7 @@ public class MockClientTest {
     @Test
     public void testGetAuthTokenFromMock() throws Exception {
         MockClient mockClient  = new MockClient();
-        assertNotNull(mockClient.getAuthToken("", ""));
+        assertNotNull(mockClient.getAuthToken());
     }
 
     /**

@@ -1,27 +1,34 @@
 package attune.client;
 
-import com.sun.corba.se.impl.presentation.rmi.ExceptionHandler;
 import org.slf4j.Logger;
 
 /**
  * Created by sudnya on 5/27/15.
  */
 public class AttuneConfigurable {
-    protected String auth_token;
-    protected String endpoint;
-    protected String middleware;
-    protected boolean disabled;
-    protected ExceptionHandler exceptionHandler;
-    protected long timeout;
+    protected String clientId         = null;
+    protected String clientSecret     = null;
+    protected String endpoint         = "http://localhost";
+    protected long timeout            = 5;
+    protected int retries             = 2;
     protected Logger logger;
-    protected boolean logging_enabled;
+    protected boolean logging_enabled = false;
+    protected boolean test_mode       = false;
 
-    public String getAuth_token() {
-        return auth_token;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setAuth_token(String auth_token) {
-        this.auth_token = auth_token;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public boolean isTest_mode() {
+        return test_mode;
+    }
+
+    public void setTest_mode(boolean test_mode) {
+        this.test_mode = test_mode;
     }
 
     public boolean isLogging_enabled() {
@@ -32,36 +39,12 @@ public class AttuneConfigurable {
         this.logging_enabled = logging_enabled;
     }
 
-    public String getEndpoint() {
-        return endpoint;
+    public Logger getLogger() {
+        return logger;
     }
 
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public String getMiddleware() {
-        return middleware;
-    }
-
-    public void setMiddleware(String middleware) {
-        this.middleware = middleware;
-    }
-
-    public ExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
-    }
-
-    public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-        this.exceptionHandler = exceptionHandler;
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     public long getTimeout() {
@@ -72,13 +55,19 @@ public class AttuneConfigurable {
         this.timeout = timeout;
     }
 
-    public Logger getLogger() {
-        return logger;
+    public String getClientSecret() {
+        return clientSecret;
     }
 
-    public void setLogger(Logger logger) {
-        this.logger = logger;
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
+    public String getEndpoint() {
+        return endpoint;
+    }
 
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
 }
