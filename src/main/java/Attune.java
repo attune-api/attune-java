@@ -7,19 +7,13 @@ import attune.client.RankingClient;
  */
 public class Attune {
 
-    private boolean testMode           = false;
-    private RankingClient attuneClient = null;
+    private boolean testMode = false;
+    private RankingClient attuneClient;
 
     // singleton instance
     public Attune(boolean testMode) {
-        if (attuneClient == null) {
-            createClient(testMode);
-        }
-    }
-
-    private void createClient(boolean testMode) {
         if (!testMode) {
-            attuneClient = new AttuneClient();
+            attuneClient = AttuneClient.getInstance();
         } else {
             attuneClient = new MockClient();
         }

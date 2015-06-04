@@ -27,13 +27,26 @@ public class AttuneClient implements RankingClient  {
     private Entities entities;
     private Anonymous anonymous;
 
+    private static AttuneClient instance;
+
+    public static AttuneClient getInstance(){
+        if (instance == null) {
+            //double checked locking for thread safe singleton
+            synchronized (AttuneClient.class) {
+                if(instance == null){
+                    instance = new AttuneClient();
+                }
+            }
+        }
+        return instance;
+    }
     /**
      * Initializes a new AttuneClient
      * @author sudnya
      * @return A new client object with configuration parameters loaded from the config.properties file
      */
 
-    public AttuneClient() {
+    private AttuneClient() {
         attuneConfigurable = new AttuneDefault();
         entities           = new Entities();
         anonymous          = new Anonymous();
