@@ -1,7 +1,3 @@
-import attune.client.AttuneClient;
-import attune.client.MockClient;
-import attune.client.RankingClient;
-
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
@@ -33,7 +29,7 @@ public class LoadConfigPropertiesTest {
      * @throws Exception
      */
     @Test
-    public void testMockInstanceInTestMode() throws Exception {
+    public void testLoadConfigFromProperties() throws Exception {
         String fileName       = "config.properties";
         Properties configFile = new Properties();
         configFile.load(getClass().getClassLoader().getResourceAsStream(fileName));
@@ -44,6 +40,7 @@ public class LoadConfigPropertiesTest {
         assertNotNull(configFile.getProperty("logging_enabled"));
         assertNotNull(configFile.getProperty("test_mode"));
         assertNotNull(configFile.getProperty("retries"));
+        assertTrue(Boolean.parseBoolean(configFile.getProperty("http.keepAlive")));
     }
 }
 
