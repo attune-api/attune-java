@@ -4,15 +4,16 @@ import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * AttuneClient Tester.
@@ -81,7 +82,7 @@ public class AttuneClientTest {
         Thread.sleep(sleepSeconds * 1000L);
 
         AttuneClient client = AttuneClient.getInstance();
-        String authToken          = client.getAuthToken();
+        String authToken    = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -89,7 +90,7 @@ public class AttuneClientTest {
         assertNotNull(anonymous);
         System.out.println("PASS: anonymousResult not null");
 
-        Customer customer         = new Customer();
+        Customer customer = new Customer();
         customer.setCustomer("junit-test-customer" + new Date().getTime());
         client.bind(anonymous.getId(), customer.getCustomer(), authToken);
     }
@@ -101,13 +102,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetBoundCustomer() throws Exception {
-        long sleepSeconds      = 30;
+        long sleepSeconds = 30;
         AttuneClient client = AttuneClient.getInstance();
 
         System.out.println("testBoundCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken();
+        String authToken = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -132,13 +133,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
-        long sleepSeconds      = 30;
+        long sleepSeconds = 30;
         AttuneClient client = AttuneClient.getInstance();
 
         System.out.println("testBoundToCorrectCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken();
+        String authToken = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -174,13 +175,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetRankings() throws Exception {
-        long sleepSeconds      = 30;
+        long sleepSeconds   = 30;
         AttuneClient client = AttuneClient.getInstance();
 
         System.out.println("testGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken       = client.getAuthToken();
+        String authToken = client.getAuthToken();
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 

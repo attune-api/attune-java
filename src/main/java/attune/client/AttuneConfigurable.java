@@ -10,7 +10,7 @@ public class AttuneConfigurable {
     protected String clientSecret     = null;
     protected String endpoint         = "http://localhost";
     protected long timeout            = 5;
-    protected int retries             = 2;
+    protected int retries             = 1;
     protected Logger logger;
     protected boolean logging_enabled = false;
     protected boolean test_mode       = false;
@@ -69,5 +69,13 @@ public class AttuneConfigurable {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public int getRetries() {
+        return retries;
+    }
+
+    public void setRetries(int retries) {
+        this.retries = retries;
     }
 }

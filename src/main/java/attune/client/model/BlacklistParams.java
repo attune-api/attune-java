@@ -1,9 +1,12 @@
 package attune.client.model;
 
-import java.util.*;
-
-import com.wordnik.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**

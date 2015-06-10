@@ -1,23 +1,23 @@
 package attune.client;
 
 import attune.client.api.Anonymous;
-import attune.client.model.AnonymousResult;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
 import attune.client.api.Entities;
+import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+
 
 /**
  * Created by sudnya on 5/27/15.
@@ -60,6 +60,7 @@ public class AttuneClient implements RankingClient  {
      * @return An auth token
      */
     public String getAuthToken() throws ApiException {
+        int counter = 0;
         String clientId     = attuneConfigurable.getClientId();
         String clientSecret = attuneConfigurable.getClientSecret();
 
@@ -68,9 +69,10 @@ public class AttuneClient implements RankingClient  {
         if (clientSecret == null)
             throw new IllegalArgumentException("clientSecret is required");
 
-        Client client            = Client.create(new DefaultClientConfig());
-        WebResource authResource = client.resource(attuneConfigurable.endpoint + "/oauth/token");
-        MultivaluedMap formData  = new MultivaluedMapImpl();
+        ClientConfig clientConfig = new DefaultClientConfig();
+        Client client             = Client.create(clientConfig);
+        WebResource authResource  = client.resource(attuneConfigurable.endpoint + "/oauth/token");
+        MultivaluedMap formData   = new MultivaluedMapImpl();
 
         formData.add("client_id"    , clientId);
         formData.add("client_secret", clientSecret);
@@ -78,16 +80,21 @@ public class AttuneClient implements RankingClient  {
 
         ClientResponse response = authResource.type(MediaType. APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
         String body             = response.getEntity(String.class);
-        String accessToken     = null;
+        String accessToken      = null;
 
-        try {
-            JSONObject json = new JSONObject(body);
-            accessToken = json.getString("access_token");
-        } catch (JSONException e) {
-            throw new ApiException();
-        } finally {
-            return accessToken;
+        while (true) {
+            try {
+                JSONObject json = new JSONObject(body);
+                accessToken = json.getString("access_token");
+                break;
+            } catch (JSONException e) {
+                ++counter;
+                if (counter >= attuneConfigurable.getRetries()) {
+                    throw new ApiException();
+                }
+            }
         }
+        return accessToken;
     }
 
 
@@ -100,7 +107,20 @@ public class AttuneClient implements RankingClient  {
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
-        return anonymous.create(authToken);
+        int counter = 0;
+        AnonymousResult retVal;
+        while (true) {
+            try {
+                retVal = anonymous.create(authToken);
+                break;
+            } catch (ApiException ex) {
+                ++counter;
+                if (counter >= attuneConfigurable.getRetries()) {
+                    throw new ApiException();
+                }
+            }
+        }
+        return retVal;
     }
 
     /**
@@ -118,9 +138,20 @@ public class AttuneClient implements RankingClient  {
      * @return BlacklistUpdateResponse
      */
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
+        int counter = 0;
         Customer customer = new Customer();
         customer.setCustomer(customerId);
-        anonymous.update(anonymousId, customer, authToken);
+        while (true) {
+            try {
+                anonymous.update(anonymousId, customer, authToken);
+                break;
+            } catch (ApiException ex) {
+                ++counter;
+                if (counter >= attuneConfigurable.getRetries()) {
+                    throw new ApiException();
+                }
+            }
+        }
     }
 
 
@@ -134,7 +165,21 @@ public class AttuneClient implements RankingClient  {
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
-        return anonymous.get(anonymousId, authToken);
+        int counter = 0;
+        Customer retVal;
+
+        while (true) {
+            try {
+                retVal = anonymous.get(anonymousId, authToken);
+                break;
+            } catch (ApiException ex) {
+                ++counter;
+                if (counter >= attuneConfigurable.getRetries()) {
+                    throw new ApiException();
+                }
+            }
+        }
+        return retVal;
     }
 
     /**
@@ -146,6 +191,20 @@ public class AttuneClient implements RankingClient  {
      * @param authToken authentication token
      */
     public RankedEntities getRankings(RankingParams rankingParams, String authToken) throws ApiException {
-        return entities.getRankings(rankingParams, authToken);
+        int counter = 0;
+        RankedEntities retVal;
+
+        while (true) {
+            try {
+                retVal = entities.getRankings(rankingParams, authToken);
+                break;
+            } catch (ApiException ex) {
+                ++counter;
+                if (counter >= attuneConfigurable.getRetries()) {
+                    throw new ApiException();
+                }
+            }
+        }
+        return retVal;
     }
 }

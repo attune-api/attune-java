@@ -1,12 +1,11 @@
 import attune.client.AttuneClient;
 import attune.client.MockClient;
 import attune.client.RankingClient;
-
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Attune Tester.

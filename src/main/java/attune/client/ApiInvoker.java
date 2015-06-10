@@ -1,28 +1,18 @@
 package attune.client;
 
-import com.fasterxml.jackson.databind.*;
-
+import com.fasterxml.jackson.databind.JavaType;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.client.WebResource.Builder;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.multipart.FormDataMultiPart;
 
 import javax.ws.rs.core.Response.Status.Family;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import java.util.TimeZone;
-
-import java.net.URLEncoder;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ApiInvoker {
   private static ApiInvoker INSTANCE = new ApiInvoker();

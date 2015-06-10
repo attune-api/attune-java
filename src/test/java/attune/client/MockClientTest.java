@@ -1,11 +1,11 @@
 package attune.client;
 
 import attune.client.model.RankingParams;
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * MockClient Tester.
