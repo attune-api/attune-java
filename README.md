@@ -72,18 +72,23 @@ The client provides a way to request a new auth_token through the API
 
 ### Configuration
 
-Attune can be configured globally via setting properties in the config.properties file of the project
-
+Attune is currently configured by setting properties in the config.properties file of the project. The config.properties file looks as follows:
 ``` java
 
 end_point=https://api.attune-staging.co
 timeout=5
 client_id=client-id
 client_secret=client-secret
-logging_enabled=true
 test_mode=true
-retries=4
-
+```
+To override these values, we have provided API calls. Here is how the properties like end_point, timeout, client_id, client_secret, test_mode can be overridden:
+``` java
+  AttuneClient client = AttuneClient.getInstance();
+  client.setEndpoint("http://localhost");
+  client.setTimeout(5.0);
+  client.setClientId("test-client-id");
+  client.setClientSecret("test-client-secret");
+  client.setTestMode(true);
 ```
 
 Settings can also be overridden by modifying the config.properties file
