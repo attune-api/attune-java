@@ -38,9 +38,7 @@ public class LoadConfigPropertiesTest {
         assertNotNull(configFile.getProperty("timeout"));
         assertNotNull(configFile.getProperty("client_id"));
         assertNotNull(configFile.getProperty("client_secret"));
-        assertNotNull(configFile.getProperty("logging_enabled"));
         assertNotNull(configFile.getProperty("test_mode"));
-        assertNotNull(configFile.getProperty("retries"));
         assertTrue(Boolean.parseBoolean(configFile.getProperty("http.keepAlive")));
     }
 }

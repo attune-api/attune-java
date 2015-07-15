@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * AttuneClient Tester.
@@ -212,6 +213,35 @@ public class AttuneClientTest {
 
         assertEquals(idList.size(), rankings.getRanking().size());
         System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testOverrideConfigParameters() throws Exception {
+        long sleepSeconds = 30;
+        System.out.println("testOverrideConfigParameters: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
+        Thread.sleep(sleepSeconds*1000L);
+
+        AttuneClient client = AttuneClient.getInstance();
+        client.setEndpoint("http://localhost");
+        assertTrue(client.getAttuneConfigurable().getEndpoint().equals("http://localhost"));
+
+        client.setTimeout(5.0);
+        assertTrue(client.getAttuneConfigurable().getTimeout() == 5.0);
+
+        client.setClientId("test-client-id");
+        assertTrue(client.getAttuneConfigurable().getClientId().equals("test-client-id"));
+
+        client.setClientSecret("test-client-secret");
+        assertTrue(client.getAttuneConfigurable().getClientSecret().equals("test-client-secret"));
+
+        client.setTestMode(true);
+        assertTrue(client.getAttuneConfigurable().isTestMode());
+
+        client.setTestMode(false);
+        assertTrue(!client.getAttuneConfigurable().isTestMode());
     }
 }
 

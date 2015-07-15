@@ -19,9 +19,6 @@ public class AttuneDefault extends AttuneConfigurable {
             this.timeout          = Long.parseLong(configFile.getProperty("timeout"));
             this.clientId         = configFile.getProperty("client_id");
             this.clientSecret     = configFile.getProperty("client_secret");
-            this.logging_enabled  = Boolean.parseBoolean(configFile.getProperty("logging_enabled"));
-            this.test_mode        = Boolean.parseBoolean(configFile.getProperty("test_mode"));
-            this.retries          = Integer.parseInt(configFile.getProperty("retries"));
         } catch (IOException e) {
             logger.error("Error loading parameters from config file");
             e.printStackTrace();

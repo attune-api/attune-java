@@ -23,10 +23,11 @@ import javax.ws.rs.core.MultivaluedMap;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
+    private final int MAX_RETRIES = 1;
+
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
-
     private static AttuneClient instance;
 
     public static AttuneClient getInstance(){
@@ -40,16 +41,61 @@ public class AttuneClient implements RankingClient  {
         }
         return instance;
     }
+
     /**
      * Initializes a new AttuneClient
      * @author sudnya
      * @return A new client object with configuration parameters loaded from the config.properties file
      */
-
     private AttuneClient() {
         attuneConfigurable = new AttuneDefault();
         entities           = new Entities();
         anonymous          = new Anonymous();
+    }
+
+    /**
+     * Overrides the default endpoint
+     * @author sudnya
+     * @return None
+     */
+    public void setEndpoint(String endpoint) {
+        this.attuneConfigurable.setEndpoint(endpoint);
+    }
+
+    /**
+     * Overrides the default timeout
+     * @author sudnya
+     * @return None
+     */
+    public void setTimeout(double timeout) {
+        this.attuneConfigurable.setTimeout(timeout);
+    }
+
+    /**
+     * Overrides the default clientId string
+     * @author sudnya
+     * @return None
+     */
+    public void setClientId(String clientId) {
+        this.attuneConfigurable.setClientId(clientId);
+    }
+
+    /**
+     * Overrides the default client secret string
+     * @author sudnya
+     * @return None
+     */
+    public void setClientSecret(String clientSecret) {
+        this.attuneConfigurable.setClientSecret(clientSecret);
+    }
+
+    /**
+     * Overrides the default client test mode setting
+     * @author sudnya
+     * @return None
+     */
+    public void setTestMode(boolean testMode) {
+        this.attuneConfigurable.setTestMode(testMode);
     }
 
     /**
@@ -89,7 +135,7 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (JSONException e) {
                 ++counter;
-                if (counter >= attuneConfigurable.getRetries()) {
+                if (counter > MAX_RETRIES) {
                     throw new ApiException();
                 }
             }
@@ -115,7 +161,7 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (ApiException ex) {
                 ++counter;
-                if (counter >= attuneConfigurable.getRetries()) {
+                if (counter > MAX_RETRIES) {
                     throw new ApiException();
                 }
             }
@@ -147,7 +193,7 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (ApiException ex) {
                 ++counter;
-                if (counter >= attuneConfigurable.getRetries()) {
+                if (counter > MAX_RETRIES) {
                     throw new ApiException();
                 }
             }
@@ -174,7 +220,7 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (ApiException ex) {
                 ++counter;
-                if (counter >= attuneConfigurable.getRetries()) {
+                if (counter > MAX_RETRIES) {
                     throw new ApiException();
                 }
             }
@@ -200,11 +246,16 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (ApiException ex) {
                 ++counter;
-                if (counter >= attuneConfigurable.getRetries()) {
+                if (counter > MAX_RETRIES) {
                     throw new ApiException();
                 }
             }
         }
         return retVal;
+    }
+
+    //TODO: this is for junit test purpose only, hence don't generate javadoc
+    public AttuneConfigurable getAttuneConfigurable() {
+        return this.attuneConfigurable;
     }
 }

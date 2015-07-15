@@ -6,14 +6,12 @@ import org.slf4j.Logger;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneConfigurable {
-    protected String clientId         = null;
-    protected String clientSecret     = null;
-    protected String endpoint         = "http://localhost";
-    protected long timeout            = 5;
-    protected int retries             = 1;
+    protected String clientId = null;
+    protected String clientSecret = null;
+    protected String endpoint = "http://localhost";
+    protected double timeout = 5.0;
     protected Logger logger;
-    protected boolean logging_enabled = false;
-    protected boolean test_mode       = false;
+    protected boolean testMode = false;
 
     public String getClientId() {
         return clientId;
@@ -23,20 +21,12 @@ public class AttuneConfigurable {
         this.clientId = clientId;
     }
 
-    public boolean isTest_mode() {
-        return test_mode;
+    public boolean isTestMode() {
+        return testMode;
     }
 
-    public void setTest_mode(boolean test_mode) {
-        this.test_mode = test_mode;
-    }
-
-    public boolean isLogging_enabled() {
-        return logging_enabled;
-    }
-
-    public void setLogging_enabled(boolean logging_enabled) {
-        this.logging_enabled = logging_enabled;
+    public void setTestMode(boolean testMode) {
+        this.testMode = testMode;
     }
 
     public Logger getLogger() {
@@ -47,11 +37,11 @@ public class AttuneConfigurable {
         this.logger = logger;
     }
 
-    public long getTimeout() {
+    public double getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(long timeout) {
+    public void setTimeout(double timeout) {
         this.timeout = timeout;
     }
 
@@ -70,12 +60,5 @@ public class AttuneConfigurable {
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
-
-    public int getRetries() {
-        return retries;
-    }
-
-    public void setRetries(int retries) {
-        this.retries = retries;
-    }
 }
+
