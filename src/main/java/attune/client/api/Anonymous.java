@@ -5,7 +5,7 @@ import attune.client.ApiInvoker;
 import attune.client.model.AnonymousResult;
 import attune.client.model.BlacklistUpdateResponse;
 import attune.client.model.Customer;
-import com.sun.jersey.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import java.util.HashMap;
 import java.util.Map;
