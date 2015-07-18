@@ -6,14 +6,12 @@ import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.WebTarget;
-//import com.sun.jersey.api.client.config.ClientConfig;
-//import com.sun.jersey.api.client.config.DefaultClientConfig;
-import javax.ws.rs.core.MultivaluedHashMap;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -117,16 +115,17 @@ public class AttuneClient implements RankingClient  {
         if (clientSecret == null)
             throw new IllegalArgumentException("clientSecret is required");
 
-        Client client = ClientBuilder.newClient();
-        WebTarget authResource  = client.target(attuneConfigurable.endpoint + "/oauth/token");
-        MultivaluedMap formData   = new MultivaluedHashMap();
+        ClientConfig clientConfig = new DefaultClientConfig();
+        Client client             = Client.create(clientConfig);
+        WebResource authResource  = client.resource(attuneConfigurable.endpoint + "/oauth/token");
+        MultivaluedMap formData   = new MultivaluedMapImpl();
 
         formData.add("client_id"    , clientId);
         formData.add("client_secret", clientSecret);
         formData.add("grant_type"   , "client_credentials");
 
-        Response response = authResource.request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(Entity.form(formData));
-        String body             = response.readEntity(String.class);
+        ClientResponse response = authResource.type(MediaType. APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+        String body             = response.getEntity(String.class);
         String accessToken      = null;
 
         while (true) {

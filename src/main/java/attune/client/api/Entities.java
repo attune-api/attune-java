@@ -3,7 +3,7 @@ package attune.client.api;
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
 import attune.client.model.*;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.FormDataMultiPart;
 
 import java.util.HashMap;
 import java.util.Map;
