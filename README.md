@@ -6,11 +6,16 @@ A client for the [Attune ranking API](http://attune.co/).
 * [Documentation] (https://github.com/attune-api/attune-java/blob/master/javadoc/index.html)
 
 ## Installation
+
 Build a jar file using:
+```groovy
 gradle jar
+```
 
 The jar file is created at:
+```
 build/libs/attune-java.jar
+```
 
 Copy this jar to the build/libs folder of your project and import it.
 
@@ -19,20 +24,20 @@ Copy this jar to the build/libs folder of your project and import it.
 ### Example usage
 
 Requests are performed through a AttuneClient object
-```
-  AttuneClient attuneClient = new AttuneClient();
-```
+```java
+  AttuneClient client = AttuneClient.getInstance();
+  ```
 
 Visitors to the application should be tagged with an anonymous user id
-```
+```java
   AnonymousResult anonoymous = client.createAnonymous(authToken);
   System.out.println("Created anonymous user with id: " + anonymous.getId());
 ```
 
 The user id can be bound to a customer id at login
-```
-  AttuneClient client        = new AttuneClient();
-  String authToken           = attuneClient.getAuthToken(clientId, clientSecret);
+```java
+  AttuneClient client        = AttuneClient.getInstance();
+  String authToken           = attuneClient.getAuthToken();
   AnonymousResult anonoymous = client.createAnonymous(authToken);
   Customer refCustomer       = new Customer();
   
@@ -41,7 +46,7 @@ The user id can be bound to a customer id at login
 ```
 The client can then perform rankings
 
-```
+```java
   RankingParams rankingParams = new RankingParams();
   
   rankingParams.setAnonymous(anonymous.getId());
@@ -60,10 +65,48 @@ The client can then perform rankings
 ```
 
 The client provides a way to request a new auth_token through the API
+```java
+  AttuneClient client = AttuneClient.getInstance();
+  String authToken    = attuneClient.getAuthToken();
 ```
-  AttuneClient attuneClient = new AttuneClient();
-  String authToken          = attuneClient.getAuthToken(clientId, clientSecret);
+
+### Configuration
+
+Attune is currently configured by setting properties in the config.properties file of the project. The config.properties file looks as follows:
+``` java
+
+end_point=https://api.attune-staging.co
+timeout=5
+client_id=client-id
+client_secret=client-secret
+test_mode=true
 ```
+To override these values, we have provided API calls. Here is how the properties like end_point, timeout, client_id, client_secret, test_mode can be overridden:
+``` java
+  AttuneClient client = AttuneClient.getInstance();
+  client.setEndpoint("http://localhost");
+  client.setTimeout(5.0);
+  client.setClientId("test-client-id");
+  client.setClientSecret("test-client-secret");
+  client.setTestMode(true);
+```
+
+Settings can also be overridden by modifying the config.properties file
+
+### Testing
+
+For testing and development, the ranking API can be simulated using.
+
+``` java
+  
+  boolean isTestMode   = true;
+  Attune attune        = new Attune(isTestMode);
+  RankingClient client = attune.getAttuneClient();
+  
+```
+
+In this mode no API calls will be made, and rankings will be returned in their original order.
+
 
 ## Contributing
 
