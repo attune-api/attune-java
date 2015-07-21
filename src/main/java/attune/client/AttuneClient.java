@@ -6,17 +6,11 @@ import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.*;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 
 /**
@@ -30,12 +24,12 @@ public class AttuneClient implements RankingClient  {
     private Anonymous anonymous;
     private static AttuneClient instance;
 
-    public static AttuneClient getInstance(){
+    public static AttuneClient getInstance(AttuneConfigurable configurable) {
         if (instance == null) {
             //double checked locking for thread safe singleton
             synchronized (AttuneClient.class) {
-                if(instance == null){
-                    instance = new AttuneClient();
+                if (instance == null) {
+                    instance = new AttuneClient(configurable);
                 }
             }
         }
@@ -47,46 +41,10 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @return A new client object with configuration parameters loaded from the config.properties file
      */
-    private AttuneClient() {
-        attuneConfigurable = new AttuneDefault();
+    private AttuneClient(AttuneConfigurable configurable) {
+        attuneConfigurable = configurable;
         entities           = new Entities();
         anonymous          = new Anonymous();
-    }
-
-    /**
-     * Overrides the default endpoint
-     * @author sudnya
-     * @return None
-     */
-    public void setEndpoint(String endpoint) {
-        this.attuneConfigurable.setEndpoint(endpoint);
-    }
-
-    /**
-     * Overrides the default timeout
-     * @author sudnya
-     * @return None
-     */
-    public void setTimeout(double timeout) {
-        this.attuneConfigurable.setTimeout(timeout);
-    }
-
-    /**
-     * Overrides the default clientId string
-     * @author sudnya
-     * @return None
-     */
-    public void setClientId(String clientId) {
-        this.attuneConfigurable.setClientId(clientId);
-    }
-
-    /**
-     * Overrides the default client secret string
-     * @author sudnya
-     * @return None
-     */
-    public void setClientSecret(String clientSecret) {
-        this.attuneConfigurable.setClientSecret(clientSecret);
     }
 
     /**
@@ -115,23 +73,22 @@ public class AttuneClient implements RankingClient  {
         if (clientSecret == null)
             throw new IllegalArgumentException("clientSecret is required");
 
-        ClientConfig clientConfig = new DefaultClientConfig();
-        Client client             = Client.create(clientConfig);
-        WebResource authResource  = client.resource(attuneConfigurable.endpoint + "/oauth/token");
-        MultivaluedMap formData   = new MultivaluedMapImpl();
+        Client client = ClientBuilder.newClient();
+        WebTarget authResource  = client.target(attuneConfigurable.endpoint).path("oauth/token");//
+        MultivaluedMap<String, String> formData   = new MultivaluedHashMap<String, String>();
 
         formData.add("client_id"    , clientId);
         formData.add("client_secret", clientSecret);
         formData.add("grant_type"   , "client_credentials");
 
-        ClientResponse response = authResource.type(MediaType. APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
-        String body             = response.getEntity(String.class);
-        String accessToken      = null;
+        String accessToken = null;
+        Response response  = authResource.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(formData));
+        String body   = response.readEntity(String.class);
 
         while (true) {
             try {
                 JSONObject json = new JSONObject(body);
-                accessToken = json.getString("access_token");
+                accessToken     = json.getString("access_token");
                 break;
             } catch (JSONException e) {
                 ++counter;
@@ -140,7 +97,7 @@ public class AttuneClient implements RankingClient  {
                 }
             }
         }
-        return accessToken;
+            return accessToken;
     }
 
 
@@ -169,8 +126,6 @@ public class AttuneClient implements RankingClient  {
         return retVal;
     }
 
-    /**
-     */
     /**
      * Requests an anonymous id, given an auth token
      * @author sudnya

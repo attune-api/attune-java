@@ -1,11 +1,15 @@
 package attune.client;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.multipart.FormDataMultiPart;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.client.WebTarget;
+//import com.sun.jersey.api.client.filter.LoggingFilter;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import javax.ws.rs.core.Response.Status.Family;
 import java.io.IOException;
@@ -162,7 +166,9 @@ public class ApiInvoker {
     }
     String querystring = b.toString();
 
-    Builder builder = client.resource(host + path + querystring).accept("application/json");
+    //Builder builder = client.resource(host + path + querystring).accept("application/json");
+    WebTarget webTarget = client.target(host + path + querystring);
+    Builder builder = webTarget.request(MediaType.APPLICATION_JSON);
     for(String key : headerParams.keySet()) {
       builder = builder.header(key, headerParams.get(key));
     }
@@ -172,23 +178,26 @@ public class ApiInvoker {
         builder = builder.header(key, defaultHeaderMap.get(key));
       }
     }
-    ClientResponse response = null;
+    Response response = null;
 
     if("GET".equals(method)) {
-      response = (ClientResponse) builder.get(ClientResponse.class);
+      response = (Response) builder.get(Response.class);
     }
     else if ("POST".equals(method)) {
       if(body == null)
-        response = builder.post(ClientResponse.class, null);
+        response = builder.post(null, Response.class);
       else if(body instanceof FormDataMultiPart) {
-        response = builder.type(contentType).post(ClientResponse.class, body);
+        builder = builder.header("Content-type", contentType);
+        response = builder.post(Entity.entity(body, MediaType.MULTIPART_FORM_DATA), Response.class);
       }
-      else
-        response = builder.type(contentType).post(ClientResponse.class, serialize(body));
+      else {
+        builder = builder.header("Content-type", contentType);
+        response = builder.post(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+      }
     }
     else if ("PUT".equals(method)) {
       if(body == null)
-        response = builder.put(ClientResponse.class, serialize(body));
+        response = builder.put(null, Response.class);
       else {
         if("application/x-www-form-urlencoded".equals(contentType)) {
           StringBuilder formParamBuilder = new StringBuilder();
@@ -208,27 +217,35 @@ public class ApiInvoker {
               }
             }
           }
-          response = builder.type(contentType).put(ClientResponse.class, formParamBuilder.toString());
+          builder = builder.header("Content-type", contentType);
+          response = builder.put(Entity.entity(formParamBuilder.toString(), MediaType.APPLICATION_FORM_URLENCODED), Response.class);
         }
-        else
-          response = builder.type(contentType).put(ClientResponse.class, serialize(body));
+        else {
+          builder = builder.header("Content-type", contentType);
+          response = builder.put(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+        }
       }
     }
     else if ("DELETE".equals(method)) {
       if(body == null)
-        response = builder.delete(ClientResponse.class);
-      else
-        response = builder.type(contentType).delete(ClientResponse.class, serialize(body));
+        response = builder.delete(Response.class);
+      else {
+        builder = builder.header("Content-type", contentType);
+        
+        //response = builder.delete(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+        // Not going to send DELETE with entity body. See http://stackoverflow.com/questions/25229880/how-to-send-enclose-data-in-delete-request-in-jersey-client
+        response = builder.delete(Response.class);
+      }
     }
     else {
       throw new ApiException(500, "unknown method type " + method);
     }
-    if(response.getClientResponseStatus() == ClientResponse.Status.NO_CONTENT) {
+    if(response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
       return null;
     }
-    else if(response.getClientResponseStatus().getFamily() == Family.SUCCESSFUL) {
+    else if(response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
       if(response.hasEntity()) {
-        return (String) response.getEntity(String.class);
+        return response.readEntity(String.class);
       }
       else {
         return "";
@@ -238,23 +255,24 @@ public class ApiInvoker {
       String message = "error";
       if(response.hasEntity()) {
         try{
-          message = String.valueOf(response.getEntity(String.class));
+          message = String.valueOf(response.getEntity());
+
         }
         catch (RuntimeException e) {
           // e.printStackTrace();
         }
       }
       throw new ApiException(
-                response.getClientResponseStatus().getStatusCode(),
+                response.getStatus(),
                 message);
     }
   }
 
   private Client getClient(String host) {
     if(!hostMap.containsKey(host)) {
-      Client client = Client.create();
-      if(isDebug)
-        client.addFilter(new LoggingFilter());
+      Client client = ClientBuilder.newClient();
+      //if(isDebug)
+      //  client.addFilter(new LoggingFilter());
       hostMap.put(host, client);
     }
     return hostMap.get(host);

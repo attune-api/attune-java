@@ -1,4 +1,5 @@
 import attune.client.AttuneClient;
+import attune.client.AttuneConfigurable;
 import attune.client.MockClient;
 import attune.client.RankingClient;
 import org.junit.After;
@@ -15,9 +16,15 @@ import static org.junit.Assert.assertTrue;
  * @since <pre>June 01, 2015</pre>
  */
 public class AttuneTest {
+    AttuneConfigurable config;
 
     @Before
     public void before() throws Exception {
+        String endpoint = "http://api.attune-staging.co";
+        double timeout = 5.0;
+        String clientId = "attune";
+        String clientSecret = "a433de60fe2311e3a3ac0800200c9a66";
+        this.config = new AttuneConfigurable(endpoint, timeout, clientId, clientSecret);
     }
 
     @After
@@ -32,7 +39,7 @@ public class AttuneTest {
     @Test
     public void testMockInstanceInTestMode() throws Exception {
         boolean isTestMode   = true;
-        Attune attune        = new Attune(isTestMode);
+        Attune attune        = new Attune(isTestMode, config);
         RankingClient client = attune.getAttuneClient();
 
         assertTrue(client instanceof MockClient);
@@ -45,7 +52,7 @@ public class AttuneTest {
     @Test
     public void testAttuneInstanceInNonTestMode() throws Exception {
         boolean isTestMode   = false;
-        Attune attune        = new Attune(isTestMode);
+        Attune attune        = new Attune(isTestMode, config);
         RankingClient client = attune.getAttuneClient();
 
         assertTrue(client instanceof AttuneClient);
