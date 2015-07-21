@@ -13,6 +13,12 @@ public class AttuneConfigurable {
     protected Logger logger;
     protected boolean testMode = false;
 
+    public AttuneConfigurable(String endpoint, double timeout, String clientId, String clientSecret) {
+        this.endpoint = endpoint;
+        this.timeout  = timeout;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
     public String getClientId() {
         return clientId;
     }

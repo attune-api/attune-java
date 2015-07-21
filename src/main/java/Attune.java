@@ -1,4 +1,5 @@
 import attune.client.AttuneClient;
+import attune.client.AttuneConfigurable;
 import attune.client.MockClient;
 import attune.client.RankingClient;
 
@@ -11,9 +12,9 @@ public class Attune {
     private RankingClient attuneClient;
 
     // singleton instance
-    public Attune(boolean testMode) {
+    public Attune(boolean testMode, AttuneConfigurable config) {
         if (!testMode) {
-            attuneClient = AttuneClient.getInstance();
+            attuneClient = AttuneClient.getInstance(config);
         } else {
             attuneClient = new MockClient();
         }
