@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +42,7 @@ public class AttuneClientTest {
     /**
      * Method: get auth token
      * @throws Exception
-     *
+     */
     @Test
     public void testAuthGetToken() throws Exception {
         long sleepSeconds = 30;
@@ -57,7 +58,7 @@ public class AttuneClientTest {
     /**
      * Method: test a anonymous get request
      * @throws Exception
-     *
+     */
     @Test
     public void testCreateAnonymous() throws Exception {
         long sleepSeconds = 30;
@@ -77,7 +78,7 @@ public class AttuneClientTest {
     /**
      * Method: test a binding call request
      * @throws Exception
-     *
+     */
     @Test
     public void testBind() throws Exception {
         long sleepSeconds = 30;
@@ -103,7 +104,7 @@ public class AttuneClientTest {
     /**
      * Method: get customer id bound to an anonymous id
      * @throws Exception
-     *
+     */
     @Test
     public void testGetBoundCustomer() throws Exception {
         long sleepSeconds = 30;
