@@ -85,10 +85,11 @@ To override these values, we have provided API calls. Here is how the properties
 ``` java
   AttuneClient client = AttuneClient.getInstance();
   client.setEndpoint("http://localhost");
-  client.setTimeout(5.0);
+  client.setTimeout(0.50); //time the client waits on a read connection before timing-out 0.50 = 500 millisec
   client.setClientId("test-client-id");
   client.setClientSecret("test-client-secret");
-  client.setTestMode(true);
+  client.setDefaultRankingOnError("fallback_to_default") // When there is a server exception, a value of 'true' displays default ranking instead of showing the exception
+  client.setTestMode(true); // no API calls to end point will be made, and rankings will be returned in their original order
 ```
 
 Settings can also be overridden by modifying the config.properties file
