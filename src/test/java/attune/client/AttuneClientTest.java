@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * AttuneClient Tester.
@@ -217,6 +218,12 @@ public class AttuneClientTest {
 
         assertEquals(idList.size(), rankings.getRanking().size());
         System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
+
+        client.setFallBackToDefault(true);
+        RankedEntities defaultList = client.getRankings(rankingParams, authToken);
+
+        assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
+        System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
     }
 
 }

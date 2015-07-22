@@ -12,6 +12,7 @@ public class AttuneConfigurable {
     protected double timeout = 5.0;
     protected Logger logger;
     protected boolean testMode = false;
+    protected boolean fallBackToDefault = false;
 
     public AttuneConfigurable(String endpoint, double timeout, String clientId, String clientSecret) {
         this.endpoint = endpoint;
@@ -65,6 +66,14 @@ public class AttuneConfigurable {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public boolean isFallBackToDefault() {
+        return fallBackToDefault;
+    }
+
+    public void setFallBackToDefault(boolean fallBackToDefault) {
+        this.fallBackToDefault = fallBackToDefault;
     }
 }
 

@@ -56,6 +56,16 @@ public class AttuneClient implements RankingClient  {
         this.attuneConfigurable.setTestMode(testMode);
     }
 
+
+    /**
+     * Overrides the client fallback to default mode setting
+     * @author sudnya
+     * @return None
+     */
+    public void setFallBackToDefault(boolean fallBackToDefault) {
+        this.attuneConfigurable.setFallBackToDefault(fallBackToDefault);
+    }
+
     /**
      * Requests an auth token
      * @author sudnya
@@ -202,6 +212,9 @@ public class AttuneClient implements RankingClient  {
             } catch (ApiException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
+                    if (attuneConfigurable.isFallBackToDefault()) {
+                        return returnDefaultRankings(rankingParams);
+                    }
                     throw new ApiException();
                 }
             }
@@ -209,8 +222,15 @@ public class AttuneClient implements RankingClient  {
         return retVal;
     }
 
+
+    private RankedEntities returnDefaultRankings(RankingParams rankingParams) throws ApiException {
+        RankedEntities rankedEntities = new RankedEntities();
+        rankedEntities.setRanking(rankingParams.getIds());
+        return rankedEntities;
+    }
+
     //TODO: this is for junit test purpose only, hence don't generate javadoc
-    public AttuneConfigurable getAttuneConfigurable() {
+    protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;
     }
 }
