@@ -2,15 +2,15 @@ package attune.client;
 
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
-import attune.client.model.AnonymousResult;
-import attune.client.model.Customer;
-import attune.client.model.RankedEntities;
-import attune.client.model.RankingParams;
+import attune.client.model.*;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -223,10 +223,52 @@ public class AttuneClient implements RankingClient  {
     }
 
 
+    /**
+     * Returns a batch of rankings of the given list of specified entities for the current user, given an auth token
+     * @author sudnya
+     * @example
+     * List<RankedEntities> listOfRankings = client.batchGetRankings(rankingParamsList, authToken)
+     * @param rankingParamsList list of objects with the ranking parameters
+     * @param authToken authentication token
+     */
+    public List<RankedEntities> batchGetRankings(List<RankingParams> rankingParamsList, String authToken) throws ApiException {
+        int counter = 0;
+        List<RankedEntities> retVal;
+        BatchRankingRequest batchRequest = new BatchRankingRequest();
+        batchRequest.setRequests(rankingParamsList);
+        BatchRankingResult result;
+
+        while (true) {
+            try {
+                result = entities.batchGetRankings(batchRequest, authToken);
+                break;
+            } catch (ApiException ex) {
+                ++counter;
+                if (counter > MAX_RETRIES) {
+                    if (attuneConfigurable.isFallBackToDefault()) {
+                        return returnBatchDefaultRankings(rankingParamsList);
+                    }
+                    throw new ApiException();
+                }
+            }
+        }
+        retVal = result.getResults();
+        return retVal;
+    }
+
+
     private RankedEntities returnDefaultRankings(RankingParams rankingParams) throws ApiException {
         RankedEntities rankedEntities = new RankedEntities();
         rankedEntities.setRanking(rankingParams.getIds());
         return rankedEntities;
+    }
+
+    private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) throws ApiException {
+        List<RankedEntities> rankedEntityList = new ArrayList<>();
+        for (RankingParams entry : rankingParamsList) {
+            rankedEntityList.add(returnDefaultRankings(entry));
+        }
+        return rankedEntityList;
     }
 
     //TODO: this is for junit test purpose only, hence don't generate javadoc

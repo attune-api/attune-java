@@ -84,7 +84,7 @@ public class Entities {
      * @param batchRequest batchRequest
      * @return BatchRankingResult
      */
-    public BatchRankingResult batchGetRankings (BatchRankingRequest batchRequest) throws ApiException {
+    public BatchRankingResult batchGetRankings (BatchRankingRequest batchRequest, String accessToken) throws ApiException {
         Object postBody = batchRequest;
 
 
@@ -95,6 +95,7 @@ public class Entities {
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
         Map<String, String> formParams = new HashMap<String, String>();
+        queryParams.put("access_token", accessToken);
 
 
 

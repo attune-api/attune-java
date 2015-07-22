@@ -226,6 +226,77 @@ public class AttuneClientTest {
         System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
     }
 
+    /**
+     * Method: verify that the rankings returned on a batchGetRankings call happened correctly and the size of the list matches the list supplied in the params
+     * @throws Exception
+     */
+    @Test
+    public void testBatchGetRankings() throws Exception {
+        long sleepSeconds   = 30;
+        AttuneClient client = AttuneClient.getInstance(config);
+
+        System.out.println("testBatchGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
+        Thread.sleep(sleepSeconds * 1000L);
+
+        String authToken = client.getAuthToken();
+        assertNotNull(authToken);
+        System.out.println("PASS: authToken not null");
+
+        System.out.println("testBatchGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
+        Thread.sleep(sleepSeconds * 1000L);
+
+        AnonymousResult anon = client.createAnonymous(authToken);
+        assertNotNull(anon);
+        System.out.println("PASS: anonymousResult not null");
+
+        RankingParams rankingParams = new RankingParams();
+        rankingParams.setAnonymous(anon.getId());
+        rankingParams.setView("b/mens-pants");
+        rankingParams.setEntityType("products");
+
+        List<String> idList = new ArrayList<String>();
+        idList.add("1001");
+        idList.add("1002");
+        idList.add("1003");
+        idList.add("1004");
+
+        rankingParams.setIds(idList);
+
+        RankingParams rankingParams2 = new RankingParams();
+        rankingParams2.setAnonymous(anon.getId());
+        rankingParams2.setView("sales/99876");
+        rankingParams2.setEntityType("saleEvents");
+
+        List<String> idList2 = new ArrayList<String>();
+        idList2.add("9991");
+        idList2.add("9992");
+        idList2.add("9993");
+        idList2.add("9994");
+
+        rankingParams2.setIds(idList2);
+
+        List<RankingParams> batchRankingParams = new ArrayList<>();
+        batchRankingParams.add(rankingParams);
+        batchRankingParams.add(rankingParams2);
+
+        List<RankedEntities> batchRankings = client.batchGetRankings(batchRankingParams, authToken);
+
+        assertNotNull(batchRankings);
+        System.out.println("PASS: rankings not null");
+
+        assertEquals(idList.size(), batchRankingParams.get(0).getIds().size());
+        System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
+
+        assertEquals(idList2.size(), batchRankingParams.get(1).getIds().size());
+        System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList2.size());
+
+        client.setFallBackToDefault(true);
+        List<RankedEntities> defaultBatchRankings = client.batchGetRankings(batchRankingParams, authToken);
+
+        assertTrue(idList.get(0).equals(defaultBatchRankings.get(0).getRanking().get(0)));
+        System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
+    }
+
 }
 
 
