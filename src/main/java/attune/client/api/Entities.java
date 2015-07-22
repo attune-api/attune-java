@@ -2,6 +2,7 @@ package attune.client.api;
 
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
+import attune.client.Version;
 import attune.client.model.*;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
@@ -66,7 +67,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             }
@@ -117,7 +118,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BatchRankingResult) ApiInvoker.deserialize(response, "", BatchRankingResult.class);
             }
@@ -166,7 +167,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistGetResponse) ApiInvoker.deserialize(response, "", BlacklistGetResponse.class);
             }
@@ -216,7 +217,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistSaveResponse) ApiInvoker.deserialize(response, "", BlacklistSaveResponse.class);
             }
@@ -267,7 +268,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Blacklist) ApiInvoker.deserialize(response, "", Blacklist.class);
             }
@@ -319,7 +320,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
@@ -370,7 +371,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistDeleteResponse) ApiInvoker.deserialize(response, "", BlacklistDeleteResponse.class);
             }

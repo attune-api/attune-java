@@ -2,6 +2,7 @@ package attune.client.api;
 
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
+import attune.client.Version;
 import attune.client.model.AnonymousResult;
 import attune.client.model.BlacklistUpdateResponse;
 import attune.client.model.Customer;
@@ -65,7 +66,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
             }
@@ -117,7 +118,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Customer) ApiInvoker.deserialize(response, "", Customer.class);
             }
@@ -170,7 +171,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType);
+            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response.equals("")) {
                 BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
                 blacklistResponse.setResult(response);

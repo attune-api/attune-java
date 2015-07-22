@@ -149,7 +149,7 @@ public class ApiInvoker {
     }
   }
 
-  public String invokeAPI(String host, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType) throws ApiException {
+  public String invokeAPI(String host, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
     Client client = getClient(host);
 
     StringBuilder b = new StringBuilder();
@@ -188,10 +188,12 @@ public class ApiInvoker {
         response = builder.post(null, Response.class);
       else if(body instanceof FormDataMultiPart) {
         builder = builder.header("Content-type", contentType);
+        builder = builder.header("User-Agent"  , userAgent);
         response = builder.post(Entity.entity(body, MediaType.MULTIPART_FORM_DATA), Response.class);
       }
       else {
         builder = builder.header("Content-type", contentType);
+        builder = builder.header("User-Agent"  , userAgent);
         response = builder.post(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
       }
     }
@@ -218,10 +220,12 @@ public class ApiInvoker {
             }
           }
           builder = builder.header("Content-type", contentType);
+          builder = builder.header("User-Agent"  , userAgent);
           response = builder.put(Entity.entity(formParamBuilder.toString(), MediaType.APPLICATION_FORM_URLENCODED), Response.class);
         }
         else {
           builder = builder.header("Content-type", contentType);
+          builder = builder.header("User-Agent"  , userAgent);
           response = builder.put(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
         }
       }
@@ -231,7 +235,8 @@ public class ApiInvoker {
         response = builder.delete(Response.class);
       else {
         builder = builder.header("Content-type", contentType);
-        
+        builder = builder.header("User-Agent"  , userAgent);
+
         //response = builder.delete(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
         // Not going to send DELETE with entity body. See http://stackoverflow.com/questions/25229880/how-to-send-enclose-data-in-delete-request-in-jersey-client
         response = builder.delete(Response.class);

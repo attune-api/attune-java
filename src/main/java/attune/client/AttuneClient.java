@@ -83,8 +83,8 @@ public class AttuneClient implements RankingClient  {
         if (clientSecret == null)
             throw new IllegalArgumentException("clientSecret is required");
 
-        Client client = ClientBuilder.newClient();
-        WebTarget authResource  = client.target(attuneConfigurable.endpoint).path("oauth/token");//
+        Client client                             = ClientBuilder.newClient();
+        WebTarget authResource                    = client.target(attuneConfigurable.endpoint).path("oauth/token");
         MultivaluedMap<String, String> formData   = new MultivaluedHashMap<String, String>();
 
         formData.add("client_id"    , clientId);
@@ -93,7 +93,7 @@ public class AttuneClient implements RankingClient  {
 
         String accessToken = null;
         Response response  = authResource.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(formData));
-        String body   = response.readEntity(String.class);
+        String body        = response.readEntity(String.class);
 
         while (true) {
             try {
