@@ -43,7 +43,7 @@ public class AttuneClientTest {
     /**
      * Method: get auth token
      * @throws Exception
-     */
+     *
     @Test
     public void testAuthGetToken() throws Exception {
         long sleepSeconds = 30;
@@ -59,7 +59,7 @@ public class AttuneClientTest {
     /**
      * Method: test a anonymous get request
      * @throws Exception
-     */
+     *
     @Test
     public void testCreateAnonymous() throws Exception {
         long sleepSeconds = 30;
@@ -79,7 +79,7 @@ public class AttuneClientTest {
     /**
      * Method: test a binding call request
      * @throws Exception
-     */
+     *
     @Test
     public void testBind() throws Exception {
         long sleepSeconds = 30;
@@ -105,7 +105,7 @@ public class AttuneClientTest {
     /**
      * Method: get customer id bound to an anonymous id
      * @throws Exception
-     */
+     *
     @Test
     public void testGetBoundCustomer() throws Exception {
         long sleepSeconds = 30;
