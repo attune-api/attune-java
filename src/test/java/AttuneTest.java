@@ -22,9 +22,7 @@ public class AttuneTest {
     public void before() throws Exception {
         String endpoint = "http://api.attune-staging.co";
         double timeout = 5.0;
-        String clientId = "attune";
-        String clientSecret = "a433de60fe2311e3a3ac0800200c9a66";
-        this.config = new AttuneConfigurable(endpoint, timeout, clientId, clientSecret);
+        this.config = new AttuneConfigurable(endpoint, timeout);
     }
 
     @After

@@ -3,26 +3,29 @@ package attune.client;
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
 import attune.client.model.*;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.*;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
     private final int MAX_RETRIES = 1;
+    private final int MAX_POSSIBLE_CONNECTIONS = 200;
+    private final int MAX_CONNECTIONS = 20;
 
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
     private static AttuneClient instance;
+    private static Client client;
 
     public static AttuneClient getInstance(AttuneConfigurable configurable) {
         if (instance == null) {
@@ -45,6 +48,31 @@ public class AttuneClient implements RankingClient  {
         attuneConfigurable = configurable;
         entities           = new Entities();
         anonymous          = new Anonymous();
+
+        ClientConfig clientConfig = getClientConfigWithConnectionPool(MAX_POSSIBLE_CONNECTIONS, MAX_CONNECTIONS);
+        this.client = ClientBuilder.newClient(clientConfig);
+    }
+
+    public void setUpConnectionPoolSize(int maxPossibleConnections, int maxConnections) {
+
+        ClientConfig clientConfig = getClientConfigWithConnectionPool(maxPossibleConnections, maxConnections);
+        this.client = null;
+        this.client = ClientBuilder.newClient(clientConfig);
+    }
+
+    private ClientConfig getClientConfigWithConnectionPool(int maxPossibleConnections, int maxConnections) {
+        ClientConfig clientConfig = new ClientConfig();
+        //clientConfig.property(ClientProperties.READ_TIMEOUT, 2000);
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, attuneConfigurable.getTimeout()*100);
+
+        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
+        connectionManager.setMaxTotal(maxPossibleConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnections);
+
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+        //ApacheConnector connector = new ApacheConnector(clientConfig);
+        //clientConfig.connector(connector);
+        return clientConfig;
     }
 
     /**
@@ -67,51 +95,6 @@ public class AttuneClient implements RankingClient  {
     }
 
     /**
-     * Requests an auth token
-     * @author sudnya
-     * @example
-     * String token = attuneClient.getAuthToken(clientId, clientSecret)
-     * @return An auth token
-     */
-    public String getAuthToken() throws ApiException {
-        int counter = 0;
-        String clientId     = attuneConfigurable.getClientId();
-        String clientSecret = attuneConfigurable.getClientSecret();
-
-        if (clientId == null)
-            throw new IllegalArgumentException("clientId is required");
-        if (clientSecret == null)
-            throw new IllegalArgumentException("clientSecret is required");
-
-        Client client                             = ClientBuilder.newClient();
-        WebTarget authResource                    = client.target(attuneConfigurable.endpoint).path("oauth/token");
-        MultivaluedMap<String, String> formData   = new MultivaluedHashMap<String, String>();
-
-        formData.add("client_id"    , clientId);
-        formData.add("client_secret", clientSecret);
-        formData.add("grant_type"   , "client_credentials");
-
-        String accessToken = null;
-        Response response  = authResource.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(formData));
-        String body        = response.readEntity(String.class);
-
-        while (true) {
-            try {
-                JSONObject json = new JSONObject(body);
-                accessToken     = json.getString("access_token");
-                break;
-            } catch (JSONException e) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw new ApiException();
-                }
-            }
-        }
-            return accessToken;
-    }
-
-
-    /**
      * Requests an anonymous id, given an auth token
      * @author sudnya
      * @example
@@ -122,6 +105,7 @@ public class AttuneClient implements RankingClient  {
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
         int counter = 0;
         AnonymousResult retVal;
+
         while (true) {
             try {
                 retVal = anonymous.create(authToken);

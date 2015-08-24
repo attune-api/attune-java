@@ -9,7 +9,6 @@ import attune.client.model.RankingParams;
  * Created by sudnya on 6/2/15.
  */
 public interface RankingClient {
-    public String getAuthToken() throws ApiException;
     public AnonymousResult createAnonymous(String authToken) throws ApiException;
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException;
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException;

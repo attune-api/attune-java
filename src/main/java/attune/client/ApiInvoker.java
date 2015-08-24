@@ -1,22 +1,23 @@
 package attune.client;
 
 import com.fasterxml.jackson.databind.JavaType;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
-//import com.sun.jersey.api.client.filter.LoggingFilter;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+//import com.sun.jersey.api.client.filter.LoggingFilter;
 
 public class ApiInvoker {
   private static ApiInvoker INSTANCE = new ApiInvoker();

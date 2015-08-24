@@ -27,16 +27,6 @@ public class MockClientTest {
 
 
     /**
-     * Method: get auth token
-     * @throws Exception
-     */
-    @Test
-    public void testGetAuthTokenFromMock() throws Exception {
-        MockClient mockClient  = new MockClient();
-        assertNotNull(mockClient.getAuthToken());
-    }
-
-    /**
      * Method: test a anonymous get request
      * @throws Exception
      */
