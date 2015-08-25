@@ -16,9 +16,10 @@ public class AttuneTest {
 
     @Before
     public void before() throws Exception {
-        String endpoint = "http://api.attune-staging.co";
-        double timeout = 5.0;
-        this.config = new AttuneConfigurable(endpoint, timeout);
+        String endpoint    = "http://api.attune-staging.co";
+        double readTimeout = 0.50;
+        this.config        = new AttuneConfigurable(endpoint);
+        this.config.updateReadTimeout(readTimeout);
     }
 
     @After

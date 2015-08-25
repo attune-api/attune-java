@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import javax.ws.rs.client.Client;
@@ -22,11 +23,8 @@ import java.util.*;
 
 
 public class ApiInvoker {
-  private final int MAX_POSSIBLE_CONNECTIONS = 200;
-  private final int MAX_CONNECTIONS          = 20;
-
   private static ApiInvoker INSTANCE = new ApiInvoker();
-  private Map<String, Client> hostMap = new HashMap<String, Client>();
+  private Map<InitConfig, Client> configInstanceMap = new HashMap<>();
   private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
 
   /**
@@ -151,8 +149,10 @@ public class ApiInvoker {
     }
   }
 
-  public String invokeAPI(String host, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
-    Client client = getClient(host);
+  public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
+    Client client = getClient(attuneConfig);
+    client.property(ClientProperties.CONNECT_TIMEOUT, convertToMilliseconds(attuneConfig.getConnectionTimeout()).intValue());
+    client.property(ClientProperties.READ_TIMEOUT, convertToMilliseconds(attuneConfig.getReadTimeout()).intValue());
 
     StringBuilder b = new StringBuilder();
 
@@ -169,7 +169,7 @@ public class ApiInvoker {
     String querystring = b.toString();
 
     //Builder builder = client.resource(host + path + querystring).accept("application/json");
-    WebTarget webTarget = client.target(host + path + querystring);
+    WebTarget webTarget = client.target(attuneConfig.getEndpoint() + path + querystring);
     Builder builder = webTarget.request(MediaType.APPLICATION_JSON);
     for(String key : headerParams.keySet()) {
       builder = builder.header(key, headerParams.get(key));
@@ -275,14 +275,19 @@ public class ApiInvoker {
     }
   }
 
-  private ClientConfig getClientConfigWithPoolingParams() {
+  private Double convertToMilliseconds(Double seconds) {
+      return seconds*1000.0;
+  }
+
+  private ClientConfig getClientConfigWithParams(AttuneConfigurable attuneConfig) {
       ClientConfig clientConfig = new ClientConfig();
-      //clientConfig.property(ClientProperties.READ_TIMEOUT, 2000);
-      //clientConfig.property(ClientProperties.CONNECT_TIMEOUT, attuneConfigurable.getTimeout()*100);
+
+      clientConfig.property(ClientProperties.READ_TIMEOUT, convertToMilliseconds(attuneConfig.getReadTimeout()).intValue());
+      clientConfig.property(ClientProperties.CONNECT_TIMEOUT, convertToMilliseconds(attuneConfig.getConnectionTimeout()).intValue());
 
       PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
-      connectionManager.setMaxTotal(MAX_POSSIBLE_CONNECTIONS);
-      connectionManager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
+      connectionManager.setMaxTotal(attuneConfig.getMaxPossiblePoolingConnections());
+      connectionManager.setDefaultMaxPerRoute(attuneConfig.getMaxConnections());
 
       clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
       //ApacheConnector connector = new ApacheConnector(clientConfig);
@@ -290,13 +295,15 @@ public class ApiInvoker {
       return clientConfig;
   }
 
-  private Client getClient(String host) {
-      if(!hostMap.containsKey(host)) {
-          Client client = ClientBuilder.newClient(getClientConfigWithPoolingParams());
-      //if(isDebug)
-      //  client.addFilter(new LoggingFilter());
-      hostMap.put(host, client);
-    }
-    return hostMap.get(host);
+  private Client getClient(AttuneConfigurable config) {
+      InitConfig initConfig = config.getInitConfig();
+
+      if(!configInstanceMap.containsKey(config)) {
+          Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
+          //if(isDebug)
+          //  client.addFilter(new LoggingFilter());
+          configInstanceMap.put(initConfig, client);
+      }
+      return configInstanceMap.get(initConfig);
   }
 }

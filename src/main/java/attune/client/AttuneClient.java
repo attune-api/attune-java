@@ -11,21 +11,19 @@ import java.util.List;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
-    private final int MAX_RETRIES              = 1;
-    private final String DEFAULT_ENDPOINT      = "https://api.attune-staging.co";
-    private final Double DEFAULT_TIMEOUT       = 5.0;
+    private final int MAX_RETRIES = 1;
 
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
     private static AttuneClient instance;
 
-    public static AttuneClient getInstance() {
+    public static AttuneClient getInstance(AttuneConfigurable configurable) {
         if (instance == null) {
             //double checked locking for thread safe singleton
             synchronized (AttuneClient.class) {
                 if (instance == null) {
-                    instance = new AttuneClient();
+                    instance = new AttuneClient(configurable);
                 }
             }
         }
@@ -37,36 +35,55 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @return A new client object with configuration parameters loaded from the config.properties file
      */
-    private AttuneClient() {
-        attuneConfigurable = new AttuneConfigurable(DEFAULT_ENDPOINT, DEFAULT_TIMEOUT);
+    private AttuneClient(AttuneConfigurable configurable) {
+        attuneConfigurable = configurable;
+
         entities           = new Entities(attuneConfigurable);
         anonymous          = new Anonymous(attuneConfigurable);
     }
 
-    public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
-        attuneConfigurable = attuneConfig;
-        entities.updateDefaultConfig(attuneConfigurable);
-        anonymous.updateDefaultConfig(attuneConfigurable);
+    /**
+     * Overrides the default value of the fallBackToDefault mode
+     * @author sudnya
+     * @example
+     * updateFallBackToDefault(true)
+     * @param defaultFallBack
+     */
+    public void updateFallBackToDefault(boolean defaultFallBack) {
+        attuneConfigurable.updateFallbackToDefaultMode(defaultFallBack);
     }
 
-
     /**
-     * Overrides the default client test mode setting
+     * Overrides the default value of the test mode
      * @author sudnya
-     * @return None
+     * @example
+     * updateTestMode(true)
+     * @param testMode
      */
-    public void setTestMode(boolean testMode) {
-        this.attuneConfigurable.setTestMode(testMode);
+    public void updateTestMode(boolean testMode) {
+        attuneConfigurable.updateTestMode(testMode);
     }
 
+    /**
+     * Overrides the default read timeout value (in seconds)
+     * @author sudnya
+     * @example
+     * updateReadTimeout(0.25)
+     * @param readTimeout (in seconds)
+     */
+    public void updateReadTimeout(Double readTimeout) {
+        attuneConfigurable.updateReadTimeout(readTimeout);
+    }
 
     /**
-     * Overrides the client fallback to default mode setting
+     * Overrides the connection timeout value (in seconds)
      * @author sudnya
-     * @return None
+     * @example
+     * updateConnectionTimeout(0.50)
+     * @param connectionTimeout (in seconds)
      */
-    public void setFallBackToDefault(boolean fallBackToDefault) {
-        this.attuneConfigurable.setFallBackToDefault(fallBackToDefault);
+    public void updateConnectionTimeout(Double connectionTimeout) {
+        attuneConfigurable.updateConnectionTimeout(connectionTimeout);
     }
 
     /**

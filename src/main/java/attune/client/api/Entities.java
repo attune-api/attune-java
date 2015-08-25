@@ -14,27 +14,15 @@ import java.util.Map;
  * Created by sudnya on 5/26/15.
  */
 public class Entities {
-    String basePath;
+    AttuneConfigurable attuneConfig;
     ApiInvoker apiInvoker = ApiInvoker.getInstance();
 
     public Entities(AttuneConfigurable attuneConfig) {
-        this.basePath = attuneConfig.getEndpoint();
-    }
-
-    public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
-        basePath = attuneConfig.getEndpoint();
+        this.attuneConfig = attuneConfig;
     }
 
     public ApiInvoker getInvoker() {
         return apiInvoker;
-    }
-
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
-
-    public String getBasePath() {
-        return basePath;
     }
 
     /**
@@ -76,7 +64,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             }
@@ -127,7 +115,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BatchRankingResult) ApiInvoker.deserialize(response, "", BatchRankingResult.class);
             }
@@ -176,7 +164,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistGetResponse) ApiInvoker.deserialize(response, "", BlacklistGetResponse.class);
             }
@@ -226,7 +214,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistSaveResponse) ApiInvoker.deserialize(response, "", BlacklistSaveResponse.class);
             }
@@ -277,7 +265,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Blacklist) ApiInvoker.deserialize(response, "", Blacklist.class);
             }
@@ -329,7 +317,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
@@ -380,7 +368,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistDeleteResponse) ApiInvoker.deserialize(response, "", BlacklistDeleteResponse.class);
             }

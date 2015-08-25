@@ -10,7 +10,7 @@ public class Attune {
     // singleton instance
     public Attune(boolean testMode) {
         if (!testMode) {
-            attuneClient = AttuneClient.getInstance();
+            attuneClient = AttuneClient.getInstance(new AttuneConfigurable());
         } else {
             attuneClient = new MockClient();
         }

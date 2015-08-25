@@ -22,11 +22,12 @@ import static org.junit.Assert.*;
  */
 
 public class AttuneClientTest {
-    AttuneConfigurable config;
     String authToken;
+    AttuneConfigurable attuneConfig;
     @Before
     public void before() throws Exception {
         this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
+        this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co");
     }
 
     @After
@@ -132,19 +133,19 @@ public class AttuneClientTest {
      */
     @Test
     public void testCorrectConfigParams() throws Exception {
-        AttuneClient client = AttuneClient.getInstance();
-        String refEndPoint = "https://api.attune-staging.co";
+        AttuneClient client   = AttuneClient.getInstance(attuneConfig);
+        String refEndPoint    = "https://api.attune-staging.co";
+
+        System.out.println(client.getAttuneConfigurable().getEndpoint());
+
         String configEndPoint = client.getAttuneConfigurable().getEndpoint();
         assertTrue(configEndPoint.equals(refEndPoint));
 
-        AttuneConfigurable newConfig = new AttuneConfigurable("localhost", 3.0);
-        client.updateDefaultConfig(newConfig);
+        Double newTimeout = 0.30;
+        client.updateReadTimeout(newTimeout);
+        System.out.println("Read timeout updated to : " + client.getAttuneConfigurable().getReadTimeout());
+        assertTrue(client.getAttuneConfigurable().getReadTimeout().equals(newTimeout));
 
-        assertTrue(client.getAttuneConfigurable().getEndpoint().equals("localhost"));
-        assertTrue(client.getAttuneConfigurable().getTimeout() == 3.0);
-
-        AttuneConfigurable defaultConfig = new AttuneConfigurable("https://api.attune-staging.co", 5.0);
-        client.updateDefaultConfig(defaultConfig);
     }
 
     /**
@@ -153,7 +154,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
-        AttuneClient client = AttuneClient.getInstance();
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(this.authToken);
         assertNotNull(anon);
@@ -178,7 +179,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance();
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -205,7 +206,7 @@ public class AttuneClientTest {
         assertEquals(idList.size(), rankings.getRanking().size());
         System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
 
-        client.setFallBackToDefault(true);
+        client.updateFallBackToDefault(true);
         RankedEntities defaultList = client.getRankings(rankingParams, authToken);
 
         assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
@@ -218,7 +219,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testBatchGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance();
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -265,7 +266,7 @@ public class AttuneClientTest {
         assertEquals(idList2.size(), batchRankingParams.get(1).getIds().size());
         System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList2.size());
 
-        client.setFallBackToDefault(true);
+        client.updateFallBackToDefault(true);
         List<RankedEntities> defaultBatchRankings = client.batchGetRankings(batchRankingParams, authToken);
 
         assertTrue(idList.get(0).equals(defaultBatchRankings.get(0).getRanking().get(0)));
@@ -273,5 +274,3 @@ public class AttuneClientTest {
     }
 
 }
-
-

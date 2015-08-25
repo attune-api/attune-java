@@ -16,28 +16,21 @@ import java.util.Map;
  * Created by sudnya on 5/26/15.
  */
 public class Anonymous {
-    String basePath;
+    AttuneConfigurable attuneConfig;
     ApiInvoker apiInvoker = ApiInvoker.getInstance();
 
     public Anonymous(AttuneConfigurable attuneConfig) {
-        basePath = attuneConfig.getEndpoint();
+        this.attuneConfig = attuneConfig;
     }
 
     public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
-        basePath = attuneConfig.getEndpoint();
+        this.attuneConfig = attuneConfig;
     }
 
     public ApiInvoker getInvoker() {
         return apiInvoker;
     }
 
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
     /**
      * Create anonymous visitor
      * Create anonymous visitor
@@ -75,7 +68,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
             }
@@ -127,7 +120,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Customer) ApiInvoker.deserialize(response, "", Customer.class);
             }
@@ -180,7 +173,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
             if(response.equals("")) {
                 BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
                 blacklistResponse.setResult(response);
