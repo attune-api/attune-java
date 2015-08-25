@@ -1,7 +1,5 @@
-import attune.client.AttuneClient;
-import attune.client.AttuneConfigurable;
-import attune.client.MockClient;
-import attune.client.RankingClient;
+package attune.client;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Attune Tester.
- *
- * @author <sudnya>
+ * Attune Tester.attune.client.Attune @author <sudnya>
  * @version 1.0
  * @since <pre>June 01, 2015</pre>
  */
@@ -37,7 +33,7 @@ public class AttuneTest {
     @Test
     public void testMockInstanceInTestMode() throws Exception {
         boolean isTestMode   = true;
-        Attune attune        = new Attune(isTestMode, config);
+        Attune attune        = new Attune(isTestMode);
         RankingClient client = attune.getAttuneClient();
 
         assertTrue(client instanceof MockClient);
@@ -50,7 +46,7 @@ public class AttuneTest {
     @Test
     public void testAttuneInstanceInNonTestMode() throws Exception {
         boolean isTestMode   = false;
-        Attune attune        = new Attune(isTestMode, config);
+        Attune attune        = new Attune(isTestMode);
         RankingClient client = attune.getAttuneClient();
 
         assertTrue(client instanceof AttuneClient);

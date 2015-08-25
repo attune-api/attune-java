@@ -3,13 +3,7 @@ package attune.client;
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
 import attune.client.model.*;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,22 +11,21 @@ import java.util.List;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
-    private final int MAX_RETRIES = 1;
-    private final int MAX_POSSIBLE_CONNECTIONS = 200;
-    private final int MAX_CONNECTIONS = 20;
+    private final int MAX_RETRIES              = 1;
+    private final String DEFAULT_ENDPOINT      = "https://api.attune-staging.co";
+    private final Double DEFAULT_TIMEOUT       = 5.0;
 
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
     private static AttuneClient instance;
-    private static Client client;
 
-    public static AttuneClient getInstance(AttuneConfigurable configurable) {
+    public static AttuneClient getInstance() {
         if (instance == null) {
             //double checked locking for thread safe singleton
             synchronized (AttuneClient.class) {
                 if (instance == null) {
-                    instance = new AttuneClient(configurable);
+                    instance = new AttuneClient();
                 }
             }
         }
@@ -44,36 +37,18 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @return A new client object with configuration parameters loaded from the config.properties file
      */
-    private AttuneClient(AttuneConfigurable configurable) {
-        attuneConfigurable = configurable;
-        entities           = new Entities();
-        anonymous          = new Anonymous();
-
-        ClientConfig clientConfig = getClientConfigWithConnectionPool(MAX_POSSIBLE_CONNECTIONS, MAX_CONNECTIONS);
-        this.client = ClientBuilder.newClient(clientConfig);
+    private AttuneClient() {
+        attuneConfigurable = new AttuneConfigurable(DEFAULT_ENDPOINT, DEFAULT_TIMEOUT);
+        entities           = new Entities(attuneConfigurable);
+        anonymous          = new Anonymous(attuneConfigurable);
     }
 
-    public void setUpConnectionPoolSize(int maxPossibleConnections, int maxConnections) {
-
-        ClientConfig clientConfig = getClientConfigWithConnectionPool(maxPossibleConnections, maxConnections);
-        this.client = null;
-        this.client = ClientBuilder.newClient(clientConfig);
+    public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
+        attuneConfigurable = attuneConfig;
+        entities.updateDefaultConfig(attuneConfigurable);
+        anonymous.updateDefaultConfig(attuneConfigurable);
     }
 
-    private ClientConfig getClientConfigWithConnectionPool(int maxPossibleConnections, int maxConnections) {
-        ClientConfig clientConfig = new ClientConfig();
-        //clientConfig.property(ClientProperties.READ_TIMEOUT, 2000);
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, attuneConfigurable.getTimeout()*100);
-
-        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
-        connectionManager.setMaxTotal(maxPossibleConnections);
-        connectionManager.setDefaultMaxPerRoute(maxConnections);
-
-        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
-        //ApacheConnector connector = new ApacheConnector(clientConfig);
-        //clientConfig.connector(connector);
-        return clientConfig;
-    }
 
     /**
      * Overrides the default client test mode setting
@@ -194,6 +169,7 @@ public class AttuneClient implements RankingClient  {
                 retVal = entities.getRankings(rankingParams, authToken);
                 break;
             } catch (ApiException ex) {
+                System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
@@ -227,6 +203,7 @@ public class AttuneClient implements RankingClient  {
                 result = entities.batchGetRankings(batchRequest, authToken);
                 break;
             } catch (ApiException ex) {
+                System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {

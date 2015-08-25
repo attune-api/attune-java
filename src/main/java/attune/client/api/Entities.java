@@ -2,6 +2,7 @@ package attune.client.api;
 
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
+import attune.client.AttuneConfigurable;
 import attune.client.Version;
 import attune.client.model.*;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
@@ -13,8 +14,16 @@ import java.util.Map;
  * Created by sudnya on 5/26/15.
  */
 public class Entities {
-    String basePath = "https://api.attune-staging.co";
+    String basePath;
     ApiInvoker apiInvoker = ApiInvoker.getInstance();
+
+    public Entities(AttuneConfigurable attuneConfig) {
+        this.basePath = attuneConfig.getEndpoint();
+    }
+
+    public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
+        basePath = attuneConfig.getEndpoint();
+    }
 
     public ApiInvoker getInvoker() {
         return apiInvoker;

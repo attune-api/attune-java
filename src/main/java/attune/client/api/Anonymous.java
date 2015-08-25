@@ -2,6 +2,7 @@ package attune.client.api;
 
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
+import attune.client.AttuneConfigurable;
 import attune.client.Version;
 import attune.client.model.AnonymousResult;
 import attune.client.model.BlacklistUpdateResponse;
@@ -15,8 +16,16 @@ import java.util.Map;
  * Created by sudnya on 5/26/15.
  */
 public class Anonymous {
-    String basePath       = "https://api.attune-staging.co";
+    String basePath;
     ApiInvoker apiInvoker = ApiInvoker.getInstance();
+
+    public Anonymous(AttuneConfigurable attuneConfig) {
+        basePath = attuneConfig.getEndpoint();
+    }
+
+    public void updateDefaultConfig(AttuneConfigurable attuneConfig) {
+        basePath = attuneConfig.getEndpoint();
+    }
 
     public ApiInvoker getInvoker() {
         return apiInvoker;

@@ -27,10 +27,6 @@ public class AttuneClientTest {
     @Before
     public void before() throws Exception {
         this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
-
-        String endpoint = "https://api.attune-staging.co";
-        double timeout  = 5.0;
-        this.config     = new AttuneConfigurable(endpoint, timeout);
     }
 
     @After
@@ -136,9 +132,19 @@ public class AttuneClientTest {
      */
     @Test
     public void testCorrectConfigParams() throws Exception {
-        long sleepSeconds = 30;
-        AttuneClient client = AttuneClient.getInstance(config);
-        client.getAttuneConfigurable();
+        AttuneClient client = AttuneClient.getInstance();
+        String refEndPoint = "https://api.attune-staging.co";
+        String configEndPoint = client.getAttuneConfigurable().getEndpoint();
+        assertTrue(configEndPoint.equals(refEndPoint));
+
+        AttuneConfigurable newConfig = new AttuneConfigurable("localhost", 3.0);
+        client.updateDefaultConfig(newConfig);
+
+        assertTrue(client.getAttuneConfigurable().getEndpoint().equals("localhost"));
+        assertTrue(client.getAttuneConfigurable().getTimeout() == 3.0);
+
+        AttuneConfigurable defaultConfig = new AttuneConfigurable("https://api.attune-staging.co", 5.0);
+        client.updateDefaultConfig(defaultConfig);
     }
 
     /**
@@ -147,25 +153,15 @@ public class AttuneClientTest {
      */
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
-        long sleepSeconds = 30;
-        AttuneClient client = AttuneClient.getInstance(config);
-
-        System.out.println("testBoundToCorrectCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds * 1000L);
+        AttuneClient client = AttuneClient.getInstance();
 
         AnonymousResult anon = client.createAnonymous(this.authToken);
         assertNotNull(anon);
         System.out.println("PASS: anonymousResult not null");
 
-        System.out.println("testBoundToCorrectCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds*1000L);
-
         Customer refCustomer = new Customer();
         refCustomer.setCustomer("junit-test-customer");
         client.bind(anon.getId(), refCustomer.getCustomer(), authToken);
-
-        System.out.println("testBoundToCorrectCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds*1000L);
 
         Customer resultCustomer = client.getBoundCustomer(anon.getId(), authToken);
         assertNotNull(resultCustomer);
@@ -182,11 +178,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetRankings() throws Exception {
-        long sleepSeconds   = 30;
-        AttuneClient client = AttuneClient.getInstance(config);
-
-        System.out.println("testGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds * 1000L);
+        AttuneClient client = AttuneClient.getInstance();
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -226,11 +218,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testBatchGetRankings() throws Exception {
-        long sleepSeconds   = 30;
-        AttuneClient client = AttuneClient.getInstance(config);
-
-        System.out.println("testBatchGetRankings: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds * 1000L);
+        AttuneClient client = AttuneClient.getInstance();
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);

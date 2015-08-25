@@ -1,6 +1,9 @@
 package attune.client;
 
 import com.fasterxml.jackson.databind.JavaType;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import javax.ws.rs.client.Client;
@@ -17,13 +20,14 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//import com.sun.jersey.api.client.filter.LoggingFilter;
 
 public class ApiInvoker {
+  private final int MAX_POSSIBLE_CONNECTIONS = 200;
+  private final int MAX_CONNECTIONS          = 20;
+
   private static ApiInvoker INSTANCE = new ApiInvoker();
   private Map<String, Client> hostMap = new HashMap<String, Client>();
   private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
-  private boolean isDebug = false;
 
   /**
    * ISO 8601 date time format.
@@ -91,9 +95,6 @@ public class ApiInvoker {
     } else {
       return String.valueOf(param);
     }
-  }
-  public void enableDebug() {
-    isDebug = true;
   }
 
   public static ApiInvoker getInstance() {
@@ -274,9 +275,24 @@ public class ApiInvoker {
     }
   }
 
+  private ClientConfig getClientConfigWithPoolingParams() {
+      ClientConfig clientConfig = new ClientConfig();
+      //clientConfig.property(ClientProperties.READ_TIMEOUT, 2000);
+      //clientConfig.property(ClientProperties.CONNECT_TIMEOUT, attuneConfigurable.getTimeout()*100);
+
+      PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
+      connectionManager.setMaxTotal(MAX_POSSIBLE_CONNECTIONS);
+      connectionManager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
+
+      clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+      //ApacheConnector connector = new ApacheConnector(clientConfig);
+      //clientConfig.connector(connector);
+      return clientConfig;
+  }
+
   private Client getClient(String host) {
-    if(!hostMap.containsKey(host)) {
-      Client client = ClientBuilder.newClient();
+      if(!hostMap.containsKey(host)) {
+          Client client = ClientBuilder.newClient(getClientConfigWithPoolingParams());
       //if(isDebug)
       //  client.addFilter(new LoggingFilter());
       hostMap.put(host, client);

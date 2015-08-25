@@ -1,6 +1,6 @@
-# Attune
+# attune.client.Attune
 
-A client for the [Attune ranking API](http://attune.co/).
+A client for the [attune.client.Attune ranking API](http://attune.co/).
 
 * [Github](https://github.com/attune-api/attune-java)
 * [Documentation] (https://github.com/attune-api/attune-java/blob/master/javadoc/index.html)
@@ -110,7 +110,7 @@ The client provides a way to request a new auth_token through the API
 
 ### Configuration
 
-Attune is currently configured by setting properties in the config.properties file of the project. Here are the default values:
+attune.client.Attune is currently configured by setting properties in the config.properties file of the project. Here are the default values:
 ``` java
 
 end_point=https://api.attune-staging.co
@@ -140,7 +140,7 @@ For testing and development, the ranking API can be simulated using.
 ``` java
   
   boolean isTestMode   = true;
-  Attune attune        = new Attune(isTestMode);
+  attune.client.Attune attune        = new attune.client.Attune(isTestMode);
   RankingClient client = attune.getAttuneClient();
   
 ```
