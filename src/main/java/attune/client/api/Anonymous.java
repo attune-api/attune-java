@@ -33,7 +33,7 @@ public class Anonymous {
 
     /**
      * Create anonymous visitor
-     * Create anonymous visitor
+     * @param auth_token authentication token
      * @return AnonymousResult
      */
     public AnonymousResult create (String auth_token) throws ApiException {
@@ -73,7 +73,7 @@ public class Anonymous {
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned = null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -82,8 +82,8 @@ public class Anonymous {
 
     /**
      * Returns an anonymous visitor, containing any assigned customer ID.
-     * Returns an anonymous visitor, containing any assigned customer ID.
      * @param anonymous anonymous
+     * @param accessToken authentication token
      * @return Customer
      */
     public Customer get (String anonymous, String accessToken) throws ApiException {
@@ -125,7 +125,7 @@ public class Anonymous {
                 return (Customer) ApiInvoker.deserialize(response, "", Customer.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -133,7 +133,6 @@ public class Anonymous {
     }
 
     /**
-     * Binds one actor to another.
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @param anonymous anonymous
      * @param request request
@@ -182,7 +181,7 @@ public class Anonymous {
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
