@@ -162,8 +162,7 @@ public class StressTestOKLMobileSpecial {
 		}
 	}
 	
-	public static void runTest(String configFile) throws IOException,
-			InterruptedException {
+	public static void runTest(String configFile) throws Exception {
 		TestConfig conf =  mapper.readValue(new File(configFile), TestConfig.class);
 
 		logger.debug(mapper.writeValueAsString(conf));
