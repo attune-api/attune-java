@@ -27,8 +27,8 @@ public class Entities {
 
     /**
      * Returns a ranking of the specified entities for the current user.
-     * Returns a ranking of the specified entities for the current user.
-     * @param params params
+     * @param params ranking params
+     * @param accessToken authentication token
      * @return RankedEntities
      */
     public RankedEntities getRankings (RankingParams params, String accessToken) throws ApiException {
@@ -70,7 +70,7 @@ public class Entities {
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -79,9 +79,9 @@ public class Entities {
 
     /**
      * Returns multiple rankings of the specified entities for the current user.
-     * Returns multiple rankings of the specified entities for the current user.
-     * @param batchRequest batchRequest
-     * @return BatchRankingResult
+     * @param batchRequest Batch (list) of ranking requests
+     * @param accessToken authentication token
+     * @return BatchRankingResult List of ranking results for given list of requests
      */
     public BatchRankingResult batchGetRankings (BatchRankingRequest batchRequest, String accessToken) throws ApiException {
         Object postBody = batchRequest;
@@ -121,7 +121,7 @@ public class Entities {
                 return (BatchRankingResult) ApiInvoker.deserialize(response, "", BatchRankingResult.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -129,7 +129,6 @@ public class Entities {
     }
 
     /**
-     * List all blacklist entries for your account.
      * List all blacklist entries for your account.
      * @return BlacklistGetResponse
      */
@@ -170,7 +169,7 @@ public class Entities {
                 return (BlacklistGetResponse) ApiInvoker.deserialize(response, "", BlacklistGetResponse.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -178,7 +177,6 @@ public class Entities {
     }
 
     /**
-     * Save a new blacklist entry.
      * Save a new blacklist entry.
      * @param params params
      * @return BlacklistSaveResponse
@@ -220,7 +218,7 @@ public class Entities {
                 return (BlacklistSaveResponse) ApiInvoker.deserialize(response, "", BlacklistSaveResponse.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -228,7 +226,6 @@ public class Entities {
     }
 
     /**
-     * Returns the blacklist with the specified ID.
      * Returns the blacklist with the specified ID.
      * @param id id
      * @return Blacklist
@@ -271,7 +268,7 @@ public class Entities {
                 return (Blacklist) ApiInvoker.deserialize(response, "", Blacklist.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -279,7 +276,6 @@ public class Entities {
     }
 
     /**
-     * Updates a blacklist with the specified ID.
      * Updates a blacklist with the specified ID.
      * @param id id
      * @param params params
@@ -323,7 +319,7 @@ public class Entities {
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;
@@ -331,7 +327,6 @@ public class Entities {
     }
 
     /**
-     * Delete blacklist by id.
      * Delete blacklist by id.
      * @param id id
      * @return BlacklistDeleteResponse
@@ -374,7 +369,7 @@ public class Entities {
                 return (BlacklistDeleteResponse) ApiInvoker.deserialize(response, "", BlacklistDeleteResponse.class);
             }
             else {
-                return null;
+                throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
             throw ex;

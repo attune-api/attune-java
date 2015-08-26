@@ -4,31 +4,31 @@ package attune.client;
  * Created by sudnya on 8/25/15.
  */
 public class RuntimeConfig {
-    private Double readTimeout;
-    private Double connectionTimeout;
+    private double readTimeout;
+    private double connectionTimeout;
     private boolean testMode;
     private boolean fallBackToDefault;
 
-    public RuntimeConfig(Double readTimeout, Double connectionTimeout, boolean testMode, boolean fallBackToDefault) {
+    public RuntimeConfig(double readTimeout, double connectionTimeout, boolean testMode, boolean fallBackToDefault) {
         this.readTimeout         = readTimeout;
         this.connectionTimeout   = connectionTimeout;
         this.testMode            = testMode;
         this.fallBackToDefault   = fallBackToDefault;
     }
 
-    public Double getReadTimeout() {
+    public double getReadTimeout() {
         return readTimeout;
     }
 
-    public void setReadTimeout(Double readTimeout) {
+    public void setReadTimeout(double readTimeout) {
         this.readTimeout = readTimeout;
     }
 
-    public Double getConnectionTimeout() {
+    public double getConnectionTimeout() {
         return connectionTimeout;
     }
 
-    public void setConnectionTimeout(Double connectionTimeout) {
+    public void setConnectionTimeout(double connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
 
