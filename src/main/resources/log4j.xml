@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false"
+                     xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+    <appender name="STDERR" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %p [%C] - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="ATTUNE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/var/log/attune/api.log"/>
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd-HH" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+        </layout>
+    </appender>
+
+    <logger name="attune">
+        <level value="DEBUG"/>
+    </logger>
+
+
+    <root>
+        <priority value="INFO"/>
+        <appender-ref ref="STDERR"/>
+        <appender-ref ref="RANKER_APP"/>
+    </root>
+
+</log4j:configuration>
