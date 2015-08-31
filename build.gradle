@@ -24,7 +24,7 @@ task execute(type:JavaExec) {
 			
 	main = mainClassName
 	classpath = sourceSets.main.runtimeClasspath
-	maxHeapSize = "2048m"
+	maxHeapSize = "4096m"
 }
 
 // In this section you declare where to find the dependencies of your project

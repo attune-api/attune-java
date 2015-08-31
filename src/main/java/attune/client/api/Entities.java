@@ -65,7 +65,6 @@ public class Entities {
 
         try {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
-            System.out.println(response);
             if(response != null){
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +51,15 @@ public class StressTestOKLMobileSpecial {
 		private String cid;
 		private String view;
 		private String app;
-		private List<String> items;
 		private AttuneClient client;
 		private String token;
 		
 		public CallThread(String aid, String cid, String view, String app,
-				List<String> items, AttuneClient client, String token) {
+				AttuneClient client, String token) {
 			this.aid = aid;
 			this.cid = cid;
 			this.view = view;
 			this.app = app;
-			this.items = items;
 			this.client = client;
 			this.token = token;
 		}
@@ -70,7 +69,7 @@ public class StressTestOKLMobileSpecial {
 			retVal.setAnonymous(aid);
 			retVal.setCustomer(cid);
 			retVal.setView(view);
-			retVal.setIds(items);
+			retVal.setIds(new ArrayList<String>());
 			retVal.setApplication(app);
 			retVal.setEntityType("products");
 			return retVal;
@@ -99,25 +98,21 @@ public class StressTestOKLMobileSpecial {
 		
 		private TestConfig config;
 		private List<String> views;
-		private List<List<String>> entities;
 		private List<String> customers;
 		private Random random;
 		private AttuneClient client;
 
 		public TestThread(AttuneClient client, TestConfig config,
-				List<String> views, List<List<String>> entities,
-				List<String> customers) {
+				List<String> views, List<String> customers) {
 			this.client = client;
 			this.config = config;
 			this.views = views;
-			this.entities = entities;
 			this.customers = customers;
 			this.random = new Random();
 		}
 		
 		@Override
 		public void run() {
-			System.out.println("OK");
 			List<Thread> threads = new ArrayList<Thread>();
 			List<CallThread> calls = new ArrayList<CallThread>();
 			
@@ -127,8 +122,7 @@ public class StressTestOKLMobileSpecial {
 			long start = System.currentTimeMillis();
 			for (int i = 0; i < views.size(); i++) {
 				CallThread call = new CallThread(aid, cid, views.get(i),
-						config.application, entities.get(i), client,
-						config.authToken);
+						config.application, client, config.authToken);
 				Thread thread = new Thread(call);
 				thread.start();
 				calls.add(call);
@@ -152,8 +146,9 @@ public class StressTestOKLMobileSpecial {
 				avgCallTime += call.callTime;
 				if (!call.success) success = false;
 			}
-			if (views.size() > 0)
+			if (views.size() > 0) {
 				avgCallTime /= views.size();
+			}
 		}
 			
 		private String getRandomCustomer(Random random) {
@@ -181,20 +176,20 @@ public class StressTestOKLMobileSpecial {
 		readEntities(conf.entityFile, views, entities, conf.numSales);
 		List<String> customers = readCustomers(conf.customerFile);
 		
-		Random random = new Random();
+		//Random random = new Random();
 		int totalMS = 0;
 		int maxMS = conf.numSeconds * 1000;
-		int maxSleepTime = (int) (2000.0 / conf.numCustomers);
+		double sleepTime = 1000.0 / conf.numCustomers;
+		
 		
 		while (totalMS < maxMS) {
-			TestThread test = new TestThread(client, conf, views, entities,
-					customers);
+			TestThread test = new TestThread(client, conf, views, customers);
 			Thread thread = new Thread(test);
 			thread.start();
 			tests.add(test);
 			threads.add(thread);
 			
-			int wait = random.nextInt(maxSleepTime);
+			int wait = (int) sleepTime; //random.nextInt(maxSleepTime);
 			Thread.sleep(wait);
 			totalMS += wait;
 		}
@@ -204,22 +199,28 @@ public class StressTestOKLMobileSpecial {
 
 		int tCalls = 0, sCalls = 0;
 		double tCTime1 = 0, tCTime2 = 0;
+		List<Double> callTimes = new ArrayList<Double>();
 		for (TestThread test : tests) {
 			tCalls ++;
 			if (test.success) {
 				sCalls ++;
 				tCTime1 += test.avgCallTime;
+				callTimes.add(test.avgCallTime);
 				tCTime2 += test.totalTime;
 			}
 		}
 		
+		double mTime = 0;
 		if (sCalls > 0) {
 			tCTime1 /= sCalls;
 			tCTime2 /= sCalls;
+			Collections.sort(callTimes);
+			mTime = callTimes.get(sCalls/2);
 		}
 		
 		logger.debug("Total calls: " + tCalls + ", successful calls: " + sCalls
-				+ ", average call time: " + tCTime1 + ", " + tCTime2);
+				+ ", average call time: " + tCTime1 + ", " + tCTime2
+				+ ", medium call time: " + mTime);
 	}
 	
 	private static void readEntities(String filename, List<String> views,
