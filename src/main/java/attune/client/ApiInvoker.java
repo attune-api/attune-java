@@ -290,8 +290,6 @@ public class ApiInvoker {
       connectionManager.setDefaultMaxPerRoute(attuneConfig.getMaxConnections());
 
       clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
-      //ApacheConnector connector = new ApacheConnector(clientConfig);
-      //clientConfig.connector(connector);
       return clientConfig;
   }
 
