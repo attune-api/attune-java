@@ -23,9 +23,9 @@ import attune.client.AttuneConfigurable;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
 
-public class StressTestOKLMobileSpecial {
+public class StressTestOKLMobileSpecial2 {
 	private static final Logger logger =
-			LoggerFactory.getLogger(StressTestOKLMobileSpecial.class);
+			LoggerFactory.getLogger(StressTestOKLMobileSpecial2.class);
 	private static TypeReference<HashMap<String, List<String>>> typ =
 			new TypeReference<HashMap<String, List<String>>>(){};
 	private static ObjectMapper mapper = new ObjectMapper();
@@ -34,135 +34,70 @@ public class StressTestOKLMobileSpecial {
 		public String serverUrl;
 		public String authToken;
 		public String application;
-		public double numCustomers;
+		public int numCustomers;
 		public int numSales;
 		public int maxConns;
 		public int maxConnsPerSite;
-		public int numSeconds;
+		public int sleepTime;
 		public String customerFile;
 		public String entityFile;
 	}
 	
 	private static class CallThread implements Runnable {
-		public boolean success = false;
-		public long callTime = 0;
+		public List<Boolean> success = new ArrayList<Boolean>();
+		public List<Long> callTimes = new ArrayList<Long>();
 		
-		private String aid;
-		private String cid;
+		private Random random = new Random();
+		private TestConfig conf;
+		private List<String> customers;
 		private String view;
-		private String app;
 		private AttuneClient client;
-		private String token;
 		
-		public CallThread(String aid, String cid, String view, String app,
-				AttuneClient client, String token) {
-			this.aid = aid;
-			this.cid = cid;
+		public CallThread(TestConfig conf, AttuneClient client, String view, 
+				List<String> customers) {
+			this.conf = conf;
+			this.customers = customers;
 			this.view = view;
-			this.app = app;
 			this.client = client;
-			this.token = token;
 		}
 
 		private RankingParams getParams() {
 			RankingParams retVal = new RankingParams();
+			int k = random.nextInt(customers.size());
+			String cid = customers.get(k);
+			String aid = random.nextInt(10000000) + "";
 			retVal.setAnonymous(aid);
 			retVal.setCustomer(cid);
 			retVal.setView(view);
 			retVal.setIds(new ArrayList<String>());
-			retVal.setApplication(app);
+			retVal.setApplication(conf.application);
 			retVal.setEntityType("products");
 			return retVal;
 		}
 
 		@Override
 		public void run() {
-			RankingParams params = getParams();
-			long start = System.currentTimeMillis();
-			RankedEntities ranking;
-			try {
-				ranking = client.getRankings(params, token);
-				long end = System.currentTimeMillis();
-				callTime = (end - start);
-				success = (ranking != null);
-			} catch (ApiException e) {
-				logger.error(e.getMessage());
-			}
-		}
-	}
-
-	private static class TestThread implements Runnable {
-		public boolean success = false;
-		public double avgCallTime;
-		public double totalTime;
-		
-		private TestConfig config;
-		private List<String> views;
-		private List<String> customers;
-		private Random random;
-		private AttuneClient client;
-
-		public TestThread(AttuneClient client, TestConfig config,
-				List<String> views, List<String> customers) {
-			this.client = client;
-			this.config = config;
-			this.views = views;
-			this.customers = customers;
-			this.random = new Random();
-		}
-		
-		@Override
-		public void run() {
-			List<Thread> threads = new ArrayList<Thread>();
-			List<CallThread> calls = new ArrayList<CallThread>();
-			
-			String cid = getRandomCustomer(random);
-			String aid = random.nextInt(10000000) + "";
-			
-			long start = System.currentTimeMillis();
-			for (int i = 0; i < views.size(); i++) {
-				CallThread call = new CallThread(aid, cid, views.get(i),
-						config.application, client, config.authToken);
-				Thread thread = new Thread(call);
-				thread.start();
-				calls.add(call);
-				threads.add(thread);
-			}
-			
-			for (Thread thread : threads) {
+			for (int i = 0; i < conf.numCustomers; i++) {
+				RankingParams params = getParams();
+				long start = System.currentTimeMillis();
+				RankedEntities ranking;
 				try {
-					thread.join();
+					ranking = client.getRankings(params, conf.authToken);
+					long end = System.currentTimeMillis();
+					callTimes.add(end - start);
+					success.add(ranking != null);
+				} catch (ApiException e) {
+					success.add(false);
+					callTimes.add(0l);
+					//logger.error(e.getMessage());
+				}
+				try {
+					Thread.sleep(conf.sleepTime);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
-			
-			long end = System.currentTimeMillis();
-			totalTime = (end - start);
-			
-			success = true;
-			for (CallThread call : calls) {
-				avgCallTime += call.callTime;
-				if (!call.success) success = false;
-			}
-			if (views.size() > 0) {
-				avgCallTime /= views.size();
-			}
 		}
-			
-		private String getRandomCustomer(Random random) {
-			int k = random.nextInt(customers.size());
-			return customers.get(k);
-		}
-	}
-	
-	private static void warmup(AttuneClient client, TestConfig conf, List<String> views,
-			List<String> customers) throws InterruptedException {
-		TestThread test = new TestThread(client, conf, views, customers);
-		Thread thread = new Thread(test);
-		thread.start();
-		thread.join();
 	}
 	
 	public static void runTest(String configFile) throws Exception {
@@ -177,64 +112,63 @@ public class StressTestOKLMobileSpecial {
 		
 		AttuneClient client = AttuneClient.getInstance(configurable);
 
-		List<TestThread> tests = new ArrayList<TestThread>();
+		List<CallThread> tests = new ArrayList<CallThread>();
 		List<Thread> threads = new ArrayList<Thread>();
 		List<List<String>> entities = new ArrayList<List<String>>();
 		List<String> views = new ArrayList<String>();
 		readEntities(conf.entityFile, views, entities, conf.numSales);
 		List<String> customers = readCustomers(conf.customerFile);
 		
-		//Random random = new Random();
-		int totalMS = 0;
-		int maxMS = conf.numSeconds * 1000;
-		double sleepTime = 1000.0 / conf.numCustomers;
-		warmup(client, conf, views, customers);
-		Thread.sleep((int) sleepTime);
-		
-		while (totalMS < maxMS) {
-			TestThread test = new TestThread(client, conf, views, customers);
+		logger.debug("Start");
+		for (int i = 0; i < conf.numSales; i++) {
+			CallThread test = new CallThread(conf, client, views.get(i), customers);
 			Thread thread = new Thread(test);
 			thread.start();
 			tests.add(test);
 			threads.add(thread);
-			
-			int wait = (int) sleepTime; //random.nextInt(maxSleepTime);
-			Thread.sleep(wait);
-			totalMS += wait;
 		}
-
+		
 		for (Thread thread : threads)
 			thread.join();
+		
+		logger.debug("Complete");
 
-		int tCalls = 0, sCalls = 0;
-		double tCTime1 = 0, tCTime2 = 0;
-		List<Double> callTimes = new ArrayList<Double>();
-		for (TestThread test : tests) {
-			tCalls ++;
-			if (test.success) {
-				sCalls ++;
-				tCTime1 += test.avgCallTime;
-				callTimes.add(test.totalTime);
-				tCTime2 += test.totalTime;
+		List<Long> callTimes = new ArrayList<Long>();
+		int sCalls = 0, tCalls = 0;
+		double sTime = 0;
+		for (CallThread test : tests) {
+			List<Long> cTimes = test.callTimes;
+			List<Boolean> success = test.success;
+			tCalls += success.size();
+			for (int i = 0; i < success.size(); i++) {
+				if (success.get(i)) {
+					callTimes.add(cTimes.get(i));
+					sTime += cTimes.get(i);
+					sCalls ++;
+				}
 			}
 		}
 		
 		double minTime = 0;
 		double medianTime = 0;
+		double tail90 = 0;
+		double tail95 = 0;
+		double tail99 = 0;
 		double maxTime = 0;
 		if (sCalls > 0) {
-			tCTime1 /= sCalls;
-			tCTime2 /= sCalls;
+			sTime /= sCalls;
 			Collections.sort(callTimes);
 			minTime = callTimes.get(0);
 			medianTime = callTimes.get(sCalls/2);
 			maxTime = callTimes.get(sCalls - 1);
+			tail90 = callTimes.get(sCalls - sCalls / 10);
+			tail95 = callTimes.get(sCalls - sCalls / 20);
+			tail99 = callTimes.get(sCalls - sCalls / 100);
 		}
 		
 		logger.debug("Total calls: " + tCalls + ", successful calls: " + sCalls
-				+ ", average request time: " + tCTime1 + ", call time: "
-				+ minTime + " - " + medianTime + " - " + tCTime2 + " -  "
-				+ maxTime);
+				+ ", call time: " + minTime + "-" + medianTime + "-" + sTime
+				+ "-" + tail90 + "-" + tail95 + "-" + tail99 + "-" + maxTime);
 	}
 	
 	private static void readEntities(String filename, List<String> views,
