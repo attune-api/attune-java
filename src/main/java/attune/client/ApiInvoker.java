@@ -302,10 +302,12 @@ public class ApiInvoker {
       InitConfig initConfig = config.getInitConfig();
 
       if(!configInstanceMap.containsKey(initConfig)) {
-          Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
-          //if(isDebug)
-          //  client.addFilter(new LoggingFilter());
-          configInstanceMap.put(initConfig, client);
+          synchronized (ApiInvoker.class) {
+              Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
+              //if(isDebug)
+              //  client.addFilter(new LoggingFilter());
+              configInstanceMap.put(initConfig, client);
+          }
       }
       return configInstanceMap.get(initConfig);
   }
