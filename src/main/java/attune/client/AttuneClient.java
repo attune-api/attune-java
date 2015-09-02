@@ -179,7 +179,6 @@ public class AttuneClient implements RankingClient  {
                 retVal = entities.getRankings(rankingParams, authToken);
                 break;
             } catch (ApiException ex) {
-               // System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
@@ -213,7 +212,6 @@ public class AttuneClient implements RankingClient  {
                 result = entities.batchGetRankings(batchRequest, authToken);
                 break;
             } catch (ApiException ex) {
-                System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
