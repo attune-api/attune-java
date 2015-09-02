@@ -277,6 +277,7 @@ public class ApiInvoker {
                 response.getStatus(),
                 message);
     }
+
   }
 
   private Double convertToMilliseconds(Double seconds) {
@@ -300,11 +301,15 @@ public class ApiInvoker {
   private Client getClient(AttuneConfigurable config) {
       InitConfig initConfig = config.getInitConfig();
 
-      if(!configInstanceMap.containsKey(config)) {
-          Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
-          //if(isDebug)
-          //  client.addFilter(new LoggingFilter());
-          configInstanceMap.put(initConfig, client);
+      synchronized (ApiInvoker.class) {
+          if (!configInstanceMap.containsKey(initConfig)) {
+              synchronized (ApiInvoker.class) {
+                  Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
+                  //if(isDebug)
+                  //  client.addFilter(new LoggingFilter());
+                  configInstanceMap.put(initConfig, client);
+              }
+          }
       }
       return configInstanceMap.get(initConfig);
   }
