@@ -217,6 +217,7 @@ public class ApiInvoker {
                 formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
               }
               catch (Exception e) {
+                response.close();
                 // move on to next
               }
             }
@@ -245,6 +246,7 @@ public class ApiInvoker {
       }
     }
     else {
+      response.close();
       throw new ApiException(500, "unknown method type " + method);
     }
     if(response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
@@ -266,9 +268,11 @@ public class ApiInvoker {
 
         }
         catch (RuntimeException e) {
+            response.close();
           // e.printStackTrace();
         }
       }
+      response.close();
       throw new ApiException(
                 response.getStatus(),
                 message);
