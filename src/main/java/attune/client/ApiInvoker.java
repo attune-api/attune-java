@@ -277,6 +277,7 @@ public class ApiInvoker {
                 response.getStatus(),
                 message);
     }
+
   }
 
   private Double convertToMilliseconds(Double seconds) {
@@ -300,7 +301,7 @@ public class ApiInvoker {
   private Client getClient(AttuneConfigurable config) {
       InitConfig initConfig = config.getInitConfig();
 
-      if(!configInstanceMap.containsKey(config)) {
+      if(!configInstanceMap.containsKey(initConfig)) {
           Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
           //if(isDebug)
           //  client.addFilter(new LoggingFilter());
