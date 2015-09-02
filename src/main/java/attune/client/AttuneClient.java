@@ -30,11 +30,6 @@ public class AttuneClient implements RankingClient  {
         return instance;
     }
 
-    /**
-     * Initializes a new AttuneClient
-     * @author sudnya
-     * @return A new client object with configuration parameters loaded from the config.properties file
-     */
     private AttuneClient(AttuneConfigurable configurable) {
         attuneConfigurable = configurable;
 
@@ -69,9 +64,9 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @example
      * updateReadTimeout(0.25)
-     * @param readTimeout (in seconds)
+     * @param readTimeout (in seconds), cannot be less than or equal to 0.0
      */
-    public void updateReadTimeout(Double readTimeout) {
+    public void updateReadTimeout(double readTimeout) throws ApiException {
         attuneConfigurable.updateReadTimeout(readTimeout);
     }
 
@@ -80,9 +75,9 @@ public class AttuneClient implements RankingClient  {
      * @author sudnya
      * @example
      * updateConnectionTimeout(0.50)
-     * @param connectionTimeout (in seconds)
+     * @param connectionTimeout (in seconds), cannot be less than or equal to 0.0
      */
-    public void updateConnectionTimeout(Double connectionTimeout) {
+    public void updateConnectionTimeout(double connectionTimeout) throws ApiException {
         attuneConfigurable.updateConnectionTimeout(connectionTimeout);
     }
 
@@ -105,7 +100,7 @@ public class AttuneClient implements RankingClient  {
             } catch (ApiException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
-                    throw new ApiException();
+                    throw ex;
                 }
             }
         }
@@ -113,16 +108,14 @@ public class AttuneClient implements RankingClient  {
     }
 
     /**
-     * Requests an anonymous id, given an auth token
+     * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @author sudnya
      * @example
      * String token = attuneClient.createAnonymous(authToken)
-     * Binds one actor to another.
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @param anonymousId anonymousId
      * @param customerId customerId
      * @param authToken authentication token
-     * @return BlacklistUpdateResponse
      */
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
         int counter = 0;
@@ -135,7 +128,7 @@ public class AttuneClient implements RankingClient  {
             } catch (ApiException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
-                    throw new ApiException();
+                    throw ex;
                 }
             }
         }
@@ -143,13 +136,13 @@ public class AttuneClient implements RankingClient  {
 
 
     /**
-     * Binds an anonymous id to a customer, given an auth token
+     * Returns the customer bound to a given anonymousId, for a given auth token
      * @author sudnya
      * @example
      * String token = attuneClient.getBinding(anonymousId, authToken)
      * @param anonymousId anonymousId
      * @param authToken authentication token
-     * @return An AnonymousResult object, do a getId on this object to get anonymousId
+     * @return A customer that was associated to this anonymousId with a bind call
      */
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
         int counter = 0;
@@ -162,7 +155,7 @@ public class AttuneClient implements RankingClient  {
             } catch (ApiException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
-                    throw new ApiException();
+                    throw ex;
                 }
             }
         }
@@ -170,7 +163,7 @@ public class AttuneClient implements RankingClient  {
     }
 
     /**
-     * Returns a ranking of the specified entities for the current user, given an auth token
+     * Returns a ranking of the specified entities, given an auth token
      * @author sudnya
      * @example
      * RankedEntities rankings = client.getRankings(rankingParams, authToken)
@@ -186,13 +179,12 @@ public class AttuneClient implements RankingClient  {
                 retVal = entities.getRankings(rankingParams, authToken);
                 break;
             } catch (ApiException ex) {
-                System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
                         return returnDefaultRankings(rankingParams);
                     }
-                    throw new ApiException();
+                    throw ex;
                 }
             }
         }
@@ -201,7 +193,7 @@ public class AttuneClient implements RankingClient  {
 
 
     /**
-     * Returns a batch of rankings of the given list of specified entities for the current user, given an auth token
+     * Returns a list of rankings of the given list of specified entities, given an auth token
      * @author sudnya
      * @example
      * List<RankedEntities> listOfRankings = client.batchGetRankings(rankingParamsList, authToken)
@@ -220,13 +212,12 @@ public class AttuneClient implements RankingClient  {
                 result = entities.batchGetRankings(batchRequest, authToken);
                 break;
             } catch (ApiException ex) {
-                System.out.println(ex);
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
                         return returnBatchDefaultRankings(rankingParamsList);
                     }
-                    throw new ApiException();
+                    throw ex;
                 }
             }
         }
@@ -235,13 +226,13 @@ public class AttuneClient implements RankingClient  {
     }
 
 
-    private RankedEntities returnDefaultRankings(RankingParams rankingParams) throws ApiException {
+    private RankedEntities returnDefaultRankings(RankingParams rankingParams) {
         RankedEntities rankedEntities = new RankedEntities();
         rankedEntities.setRanking(rankingParams.getIds());
         return rankedEntities;
     }
 
-    private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) throws ApiException {
+    private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) {
         List<RankedEntities> rankedEntityList = new ArrayList<>();
         for (RankingParams entry : rankingParamsList) {
             rankedEntityList.add(returnDefaultRankings(entry));

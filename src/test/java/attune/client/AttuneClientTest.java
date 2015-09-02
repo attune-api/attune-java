@@ -141,10 +141,10 @@ public class AttuneClientTest {
         String configEndPoint = client.getAttuneConfigurable().getEndpoint();
         assertTrue(configEndPoint.equals(refEndPoint));
 
-        Double newTimeout = 0.30;
+        double newTimeout = 0.30;
         client.updateReadTimeout(newTimeout);
         System.out.println("Read timeout updated to : " + client.getAttuneConfigurable().getReadTimeout());
-        assertTrue(client.getAttuneConfigurable().getReadTimeout().equals(newTimeout));
+        assertTrue(client.getAttuneConfigurable().getReadTimeout() == newTimeout);
 
     }
 

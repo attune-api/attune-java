@@ -5,10 +5,10 @@ package attune.client;
  */
 public class InitConfig {
     private final String endpoint;
-    private final Integer maxPossiblePoolingConnections;
-    private final Integer maxConnections;
+    private final int maxPossiblePoolingConnections;
+    private final int maxConnections;
 
-    public InitConfig(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections) {
+    public InitConfig(String endpoint, int maxPossiblePoolingConnections, int maxConnections) {
         this.endpoint                      = endpoint;
         this.maxPossiblePoolingConnections = maxPossiblePoolingConnections;
         this.maxConnections                = maxConnections;
@@ -18,11 +18,11 @@ public class InitConfig {
         return endpoint;
     }
 
-    public Integer getMaxPossiblePoolingConnections() {
+    public int getMaxPossiblePoolingConnections() {
         return maxPossiblePoolingConnections;
     }
 
-    public Integer getMaxConnections() {
+    public int getMaxConnections() {
         return maxConnections;
     }
 }

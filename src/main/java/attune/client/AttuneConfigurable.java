@@ -5,10 +5,10 @@ package attune.client;
  */
 public class AttuneConfigurable {
     private String endpoint                       = "http://localhost";
-    private Double readTimeout                    = 0.25;
-    private Double connectionTimeout              = 0.50;
-    private Integer maxPossiblePoolingConnections = 1000;
-    private Integer maxConnections                = 200;
+    private double readTimeout                    = 0.25;
+    private double connectionTimeout              = 0.50;
+    private int maxPossiblePoolingConnections     = 1000;
+    private int maxConnections                    = 200;
     private boolean testMode                      = false;
     private boolean fallBackToDefault             = false;
 
@@ -38,27 +38,47 @@ public class AttuneConfigurable {
         return this.initConfig.getEndpoint();
     }
 
-    public Integer getMaxPossiblePoolingConnections() {
+    public int getMaxPossiblePoolingConnections() {
         return this.initConfig.getMaxPossiblePoolingConnections();
     }
 
-    public Integer getMaxConnections() {
+    public int getMaxConnections() {
         return this.initConfig.getMaxConnections();
     }
 
-    public Double getReadTimeout() {
+    public double getReadTimeout() {
         return this.runtimeConfig.getReadTimeout();
     }
 
-    public void updateReadTimeout(Double readTimeout) {
+    /**
+     * Overrides the default read timeout value (in seconds)
+     * @author sudnya
+     * @example
+     * updateReadTimeout(0.25)
+     * @param readTimeout (in seconds), cannot be less than or equal to 0.0
+     */
+    public void updateReadTimeout(double readTimeout) throws ApiException {
+        if (readTimeout <= 0.0) {
+            throw new ApiException(400, "Read timeout value has to be greater than 0.0 seconds");
+        }
         this.runtimeConfig.setReadTimeout(readTimeout);
     }
 
-    public Double getConnectionTimeout() {
+    public double getConnectionTimeout() {
         return this.runtimeConfig.getConnectionTimeout();
     }
 
-    public void updateConnectionTimeout(Double connectionTimeout) {
+    /**
+     * Overrides the connection timeout value (in seconds)
+     * @author sudnya
+     * @example
+     * updateConnectionTimeout(0.50)
+     * @param connectionTimeout (in seconds), cannot be less than or equal to 0.0
+     */
+    public void updateConnectionTimeout(double connectionTimeout) throws ApiException {
+        if (connectionTimeout <= 0.0) {
+            throw new ApiException(400, "Connection timeout value has to be greater than 0.0 seconds");
+        }
         this.runtimeConfig.setConnectionTimeout(connectionTimeout);
     }
 
@@ -66,6 +86,13 @@ public class AttuneConfigurable {
         return runtimeConfig.isTestMode();
     }
 
+    /**
+     * Overrides the default value of the test mode
+     * @author sudnya
+     * @example
+     * updateTestMode(true)
+     * @param testMode
+     */
     public void updateTestMode(boolean testMode) {
         this.runtimeConfig.setTestMode(testMode);
     }
@@ -74,99 +101,14 @@ public class AttuneConfigurable {
         return this.runtimeConfig.isFallBackToDefault();
     }
 
+    /**
+     * Overrides the default value of the fallBackToDefaultMode
+     * @author sudnya
+     * @example
+     * updateFallBackToDefaultMode(true)
+     * @param fallBackToDefault
+     */
     public void updateFallbackToDefaultMode(boolean fallBackToDefault) {
         this.runtimeConfig.setFallBackToDefault(fallBackToDefault);
     }
-
-
 }
-/*
-    //Java does not support default params, so http://stackoverflow.com/questions/7428039/java-constructor-method-with-optional-parameters
-    private AttuneConfigurable(ConfigBuilder configBuilder) {
-
-        this.endpoint                      = configBuilder.endpoint;
-        this.readTimeout                   = configBuilder.readTimeout;
-        this.connectionTimeout             = configBuilder.connectionTimeout;
-        this.maxPossiblePoolingConnections = configBuilder.maxPossiblePoolingConnections;
-        this.maxConnections                = configBuilder.maxConnections;
-        this.testMode                      = configBuilder.testMode;
-        this.fallBackToDefault             = configBuilder.fallBackToDefault;
-    }
-
-    public static class ConfigBuilder {
-        private String endpoint = "http://localhost";
-        private Double readTimeout = 0.25;
-        private Double connectionTimeout = 0.50;
-        private int maxPossiblePoolingConnections = 1000;
-        private int maxConnections = 200;
-        private boolean testMode = false;
-        private boolean fallBackToDefault = false;
-
-        public ConfigBuilder endpoint(String endpoint) {
-            this.endpoint = endpoint;
-            return this;
-        }
-
-        public ConfigBuilder readTimeout(Double readTimeout) {
-            this.readTimeout = readTimeout;
-            return this;
-        }
-
-        public ConfigBuilder connectionTimeout(Double connectionTimeout) {
-            this.connectionTimeout = connectionTimeout;
-            return this;
-        }
-
-        public ConfigBuilder maxPossiblePoolingConnections(int maxPossiblePoolingConnections) {
-            this.maxPossiblePoolingConnections = maxPossiblePoolingConnections;
-            return this;
-        }
-
-        public ConfigBuilder maxConnections(int maxConnections) {
-            this.maxConnections = maxConnections;
-            return this;
-        }
-
-        public ConfigBuilder testMode(boolean testMode) {
-            this.testMode = testMode;
-            return this;
-        }
-
-        public ConfigBuilder fallBackToDefault(boolean fallBackToDefault) {
-            this.fallBackToDefault = fallBackToDefault;
-            return this;
-        }
-
-        public AttuneConfigurable build() {
-            return new AttuneConfigurable(this);
-        }
-    }
-
-    public boolean isFallBackToDefault() {
-        return fallBackToDefault;
-    }
-
-    public String getEndpoint() {
-        return endpoint;
-    }
-
-    public Double getReadTimeout() {
-        return readTimeout;
-    }
-
-    public Double getConnectionTimeout() {
-        return connectionTimeout;
-    }
-
-    public int getMaxPossiblePoolingConnections() {
-        return maxPossiblePoolingConnections;
-    }
-
-    public int getMaxConnections() {
-        return maxConnections;
-    }
-
-    public boolean isTestMode() {
-        return testMode;
-    }
-}*/
