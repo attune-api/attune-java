@@ -36,13 +36,14 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/ranking".replaceAll("\\{format\\}","json");
+        String path = "/entities/ranking";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
         Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
+        //headerParams.put("access_token", accessToken);
 
 
 
@@ -87,13 +88,14 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/ranking/many".replaceAll("\\{format\\}","json");
+        String path = "/entities/ranking/many";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
         Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
+        //headerParams.put("access_token", accessToken);
 
 
 
@@ -136,7 +138,7 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/rankings/blacklists".replaceAll("\\{format\\}","json");
+        String path = "/entities/rankings/blacklists";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -185,7 +187,7 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/rankings/blacklists".replaceAll("\\{format\\}","json");
+        String path = "/entities/rankings/blacklists";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -234,8 +236,7 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/rankings/blacklists/{id}".replaceAll("\\{format\\}","json")
-                .replaceAll("\\{" + "id" + "\\}", apiInvoker.escapeString(id.toString()));
+        String path = "/entities/rankings/blacklists/{" + apiInvoker.escapeString(id.toString()) + "}";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -285,8 +286,7 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/rankings/blacklists/{id}".replaceAll("\\{format\\}","json")
-                .replaceAll("\\{" + "id" + "\\}", apiInvoker.escapeString(id.toString()));
+        String path = "/entities/rankings/blacklists/{" + apiInvoker.escapeString(id.toString()) + "}";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -335,8 +335,7 @@ public class Entities {
 
 
         // create path and map variables
-        String path = "/entities/rankings/blacklists/{id}".replaceAll("\\{format\\}","json")
-                .replaceAll("\\{" + "id" + "\\}", apiInvoker.escapeString(id.toString()));
+        String path = "/entities/rankings/blacklists/{" + apiInvoker.escapeString(id.toString()) + "}";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();

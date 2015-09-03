@@ -246,10 +246,10 @@ public class ApiInvoker {
       }
     }
     else {
-      response.close();
       throw new ApiException(500, "unknown method type " + method);
     }
     if(response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+      response.close();
       return null;
     }
     else if(response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
@@ -257,6 +257,7 @@ public class ApiInvoker {
         return response.readEntity(String.class);
       }
       else {
+        response.close();
         return "";
       }
     }
