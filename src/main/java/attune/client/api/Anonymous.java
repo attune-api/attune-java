@@ -41,7 +41,7 @@ public class Anonymous {
 
 
         // create path and map variables
-        String path = "/anonymous".replaceAll("\\{format\\}","json");
+        String path = "/anonymous";
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -91,8 +91,7 @@ public class Anonymous {
 
 
         // create path and map variables
-        String path = "/anonymous/{anonymous}".replaceAll("\\{format\\}","json")
-                .replaceAll("\\{" + "anonymous" + "\\}", apiInvoker.escapeString(anonymous.toString()));
+        String path = "/anonymous/" + apiInvoker.escapeString(anonymous.toString());
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
@@ -143,8 +142,7 @@ public class Anonymous {
 
 
         // create path and map variables
-        String path = "/anonymous/{anonymous}".replaceAll("\\{format\\}","json")
-                .replaceAll("\\{" + "anonymous" + "\\}", apiInvoker.escapeString(anonymous.toString()));
+        String path = "/anonymous/" + apiInvoker.escapeString(anonymous.toString());
 
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
