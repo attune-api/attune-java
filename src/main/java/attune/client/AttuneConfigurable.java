@@ -16,18 +16,18 @@ public class AttuneConfigurable {
     private RuntimeConfig runtimeConfig;
 
     public AttuneConfigurable() {
-        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections);
-        this.runtimeConfig  = new RuntimeConfig(readTimeout, connectionTimeout, testMode, fallBackToDefault);
+        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
     public AttuneConfigurable(String endpoint) {
-        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections);
-        this.runtimeConfig  = new RuntimeConfig(readTimeout, connectionTimeout, testMode, fallBackToDefault);
+        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
     public AttuneConfigurable(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections) {
-        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections);
-        this.runtimeConfig  = new RuntimeConfig(readTimeout, connectionTimeout, testMode, fallBackToDefault);
+        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
     public InitConfig getInitConfig() {
@@ -47,39 +47,11 @@ public class AttuneConfigurable {
     }
 
     public double getReadTimeout() {
-        return this.runtimeConfig.getReadTimeout();
-    }
-
-    /**
-     * Overrides the default read timeout value (in seconds)
-     * @author sudnya
-     * @example
-     * updateReadTimeout(0.25)
-     * @param readTimeout (in seconds), cannot be less than or equal to 0.0
-     */
-    public void updateReadTimeout(double readTimeout) throws ApiException {
-        if (readTimeout <= 0.0) {
-            throw new ApiException(400, "Read timeout value has to be greater than 0.0 seconds");
-        }
-        this.runtimeConfig.setReadTimeout(readTimeout);
+        return this.initConfig.getReadTimeout();
     }
 
     public double getConnectionTimeout() {
-        return this.runtimeConfig.getConnectionTimeout();
-    }
-
-    /**
-     * Overrides the connection timeout value (in seconds)
-     * @author sudnya
-     * @example
-     * updateConnectionTimeout(0.50)
-     * @param connectionTimeout (in seconds), cannot be less than or equal to 0.0
-     */
-    public void updateConnectionTimeout(double connectionTimeout) throws ApiException {
-        if (connectionTimeout <= 0.0) {
-            throw new ApiException(400, "Connection timeout value has to be greater than 0.0 seconds");
-        }
-        this.runtimeConfig.setConnectionTimeout(connectionTimeout);
+        return this.initConfig.getConnectionTimeout();
     }
 
     public boolean isTestMode() {
