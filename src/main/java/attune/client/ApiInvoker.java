@@ -154,19 +154,18 @@ public class ApiInvoker {
     client.property(ClientProperties.CONNECT_TIMEOUT, convertToMilliseconds(attuneConfig.getConnectionTimeout()).intValue());
     client.property(ClientProperties.READ_TIMEOUT, convertToMilliseconds(attuneConfig.getReadTimeout()).intValue());
 
-    StringBuilder b = new StringBuilder();
-
+    String querystring = "";
     for(String key : queryParams.keySet()) {
-      String value = queryParams.get(key);
-      if (value != null){
-        if(b.toString().length() == 0)
-          b.append("?");
-        else
-          b.append("&");
-        b.append(escapeString(key)).append("=").append(escapeString(value));
-      }
+        String value = queryParams.get(key);
+        if (value != null){
+            if(querystring.length() == 0)
+                querystring += "?";
+            else
+                querystring += "&";
+            querystring += escapeString(key) + "=" + escapeString(value);
+        }
     }
-    String querystring = b.toString();
+
 
     //Builder builder = client.resource(host + path + querystring).accept("application/json");
     WebTarget webTarget = client.target(attuneConfig.getEndpoint() + path + querystring);
