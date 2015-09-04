@@ -7,6 +7,8 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -135,18 +137,8 @@ public class ApiInvoker {
         }
     }
 
-    public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
-
-        //get client from hashmap (if already present)
-        Client client = getClient(attuneConfig);
-
-        client.property(ClientProperties.CONNECT_TIMEOUT, convertToMilliseconds(attuneConfig.getConnectionTimeout()).intValue());
-        client.property(ClientProperties.READ_TIMEOUT, convertToMilliseconds(attuneConfig.getReadTimeout()).intValue());
-
-
-        //build query string for api request
+    private String buildQueryFromQueryParams(Map<String, String> queryParams) {
         StringBuilder b = new StringBuilder();
-
         for(String key : queryParams.keySet()) {
             String value = queryParams.get(key);
             if (value != null) {
@@ -157,12 +149,12 @@ public class ApiInvoker {
                 b.append(escapeString(key)).append("=").append(escapeString(value));
             }
         }
+        return b.toString();
+    }
 
-        String querystring = b.toString();
-
-        //build a request, and header
+    private Builder getBuilderWithCorrectHeader(Client client, Map<String, String>headerParams, String target) {
         //Builder builder = client.resource(host + path + querystring).accept("application/json");
-        WebTarget webTarget = client.target(attuneConfig.getEndpoint() + path + querystring);
+        WebTarget webTarget = client.target(target);
         Builder builder     = webTarget.request(MediaType.APPLICATION_JSON);
         for(String key : headerParams.keySet()) {
             builder = builder.header(key, headerParams.get(key));
@@ -173,97 +165,80 @@ public class ApiInvoker {
                 builder = builder.header(key, defaultHeaderMap.get(key));
             }
         }
+        return builder;
+    }
+
+    public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
+
+        //get client from hashmap (if already present)
+        Client client      = getClient(attuneConfig);
+
+        //build query string for api request
+        String querystring = buildQueryFromQueryParams(queryParams);
+
+        //build a request from header
+        String target      = attuneConfig.getEndpoint() + path + querystring;
+        Builder builder    = getBuilderWithCorrectHeader(client, headerParams, target);
 
         // categorize request into GET, PUT, POST and accordingly do varying things
-        Response response = null;
+        String retVal       = null;
+        Response response   = null;
 
-        if("GET".equals(method)) {
-            response = (Response) builder.get(Response.class);
-        } else if ("POST".equals(method)) {
-            if(body == null)
-                response = builder.post(null, Response.class);
-            else if(body instanceof FormDataMultiPart) {
-                builder = builder.header("Content-type", contentType);
-                builder = builder.header("User-Agent"  , userAgent);
-                response = builder.post(Entity.entity(body, MediaType.MULTIPART_FORM_DATA), Response.class);
-        } else {
-            builder = builder.header("Content-type", contentType);
-            builder = builder.header("User-Agent"  , userAgent);
-            response = builder.post(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
-            }
-        } else if ("PUT".equals(method)) {
-            if(body == null)
-                response = builder.put(null, Response.class);
-            else {
-                if("application/x-www-form-urlencoded".equals(contentType)) {
-                    StringBuilder formParamBuilder = new StringBuilder();
-
-                    // encode the form params
-                    for(String key : formParams.keySet()) {
-                        String value = formParams.get(key);
-                        if(value != null && !"".equals(value.trim())) {
-                            if(formParamBuilder.length() > 0) {
-                                formParamBuilder.append("&");
-                            }
-                            try {
-                            formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
-                            } catch (Exception e) {
-                            response.close();
-                            // move on to next
-                            }
-                        }
-                    }
-                    builder = builder.header("Content-type", contentType);
-                    builder = builder.header("User-Agent"  , userAgent);
-                    response = builder.put(Entity.entity(formParamBuilder.toString(), MediaType.APPLICATION_FORM_URLENCODED), Response.class);
+        try {
+            //process API request
+            if ("GET".equals(method)) {
+                response = (Response) builder.get(Response.class);
+            } else if ("POST".equals(method)) {
+                if (body == null) {
+                    response = builder.post(null, Response.class);
+                } else {
+                    builder  = builder.header("Content-type", contentType);
+                    builder  = builder.header("User-Agent", userAgent);
+                    response = builder.post(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
                 }
-                else {
+            } else if ("PUT".equals(method)) {
+                if (body == null) {
+                    response = builder.put(null, Response.class);
+                } else {
+                        builder  = builder.header("Content-type", contentType);
+                        builder  = builder.header("User-Agent", userAgent);
+                        response = builder.put(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+                }
+            } else if ("DELETE".equals(method)) {
+                if (body == null) {
+                    response = builder.delete(Response.class);
+                } else {
                     builder = builder.header("Content-type", contentType);
-                    builder = builder.header("User-Agent"  , userAgent);
-                    response = builder.put(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+                    builder = builder.header("User-Agent", userAgent);
+
+                    //response = builder.delete(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
+                    // Not going to send DELETE with entity body. See http://stackoverflow.com/questions/25229880/how-to-send-enclose-data-in-delete-request-in-jersey-client
+                    response = builder.delete(Response.class);
                 }
             }
-        } else if ("DELETE".equals(method)) {
-            if(body == null)
-                response = builder.delete(Response.class);
-            else {
-                builder = builder.header("Content-type", contentType);
-                builder = builder.header("User-Agent"  , userAgent);
 
-                //response = builder.delete(Entity.entity(serialize(body), MediaType.APPLICATION_JSON), Response.class);
-                // Not going to send DELETE with entity body. See http://stackoverflow.com/questions/25229880/how-to-send-enclose-data-in-delete-request-in-jersey-client
-                response = builder.delete(Response.class);
-            }
-        } else {
-            //TODO: not here
-            throw new ApiException(500, "unknown method type " + method);
-        }
-
-        // depending on response status, either throw exception or return
-        if(response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
-            response.close();
-            return null;
-        } else if(response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
-            if(response.hasEntity()) {
-                return response.readEntity(String.class);
+            // based on response status, either throw exception or return
+            if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+                retVal = null;
+            } else if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
+                if (response.hasEntity()) {
+                    retVal = response.readEntity(String.class);
+                } else {
+                    retVal = "";
+                }
             } else {
-                response.close();
-                return "";
-            }
-        } else {
-            String message = "error";
-            if(response.hasEntity()) {
-                try{
-                    message = String.valueOf(response.getEntity());
-                } catch (RuntimeException e) {
-                    response.close();
-                    // e.printStackTrace();
+                if (response.hasEntity()) {
+                    retVal = "Error " + String.valueOf(response.getEntity()) + " ";
                 }
             }
+        } catch (ProcessingException p) {
+            throw new ApiException(100, p.getMessage());
+        } catch (WebApplicationException w) {
+            throw new ApiException(100, w.getMessage());
+        } finally {
             response.close();
-            throw new ApiException(response.getStatus(), message);
+            return retVal;
         }
-
     }
 
     private Double convertToMilliseconds(Double seconds) {
