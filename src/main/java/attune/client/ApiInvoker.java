@@ -168,7 +168,8 @@ public class ApiInvoker {
         return builder;
     }
 
-    public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType, String userAgent) throws ApiException {
+    public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body,
+        Map<String, String> headerParams, String contentType, String userAgent) throws ApiException {
 
         //get client from hashmap (if already present)
         Client client      = getClient(attuneConfig);
