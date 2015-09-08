@@ -5,13 +5,8 @@ mainGeneratedRest
 target/
 dist/
 bin/
-abtest/src/main/java/attune/abtest/generated
-# builders
-api/api/src/main/idl
-api/api/src/main/snapshot
-api/api/src/mainGeneratedDataTemplate/
-
 out/
+lib/
 
 # Package Files #
 *.war

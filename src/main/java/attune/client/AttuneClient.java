@@ -60,28 +60,6 @@ public class AttuneClient implements RankingClient  {
     }
 
     /**
-     * Overrides the default read timeout value (in seconds)
-     * @author sudnya
-     * @example
-     * updateReadTimeout(0.25)
-     * @param readTimeout (in seconds), cannot be less than or equal to 0.0
-     */
-    public void updateReadTimeout(double readTimeout) throws ApiException {
-        attuneConfigurable.updateReadTimeout(readTimeout);
-    }
-
-    /**
-     * Overrides the connection timeout value (in seconds)
-     * @author sudnya
-     * @example
-     * updateConnectionTimeout(0.50)
-     * @param connectionTimeout (in seconds), cannot be less than or equal to 0.0
-     */
-    public void updateConnectionTimeout(double connectionTimeout) throws ApiException {
-        attuneConfigurable.updateConnectionTimeout(connectionTimeout);
-    }
-
-    /**
      * Requests an anonymous id, given an auth token
      * @author sudnya
      * @example

@@ -19,7 +19,6 @@ public class AttuneTest {
         String endpoint    = "http://api.attune-staging.co";
         double readTimeout = 0.50;
         this.config        = new AttuneConfigurable(endpoint);
-        this.config.updateReadTimeout(readTimeout);
     }
 
     @After
