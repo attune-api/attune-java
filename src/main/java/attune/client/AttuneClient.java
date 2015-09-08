@@ -40,8 +40,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Overrides the default value of the fallBackToDefault mode
      * @author sudnya
-     * @example
-     * updateFallBackToDefault(true)
      * @param defaultFallBack
      */
     public void updateFallBackToDefault(boolean defaultFallBack) {
@@ -51,8 +49,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Overrides the default value of the test mode
      * @author sudnya
-     * @example
-     * updateTestMode(true)
      * @param testMode
      */
     public void updateTestMode(boolean testMode) {
@@ -62,8 +58,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Requests an anonymous id, given an auth token
      * @author sudnya
-     * @example
-     * String token = attuneClient.createAnonymous(authToken)
      * @param authToken authentication token
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
@@ -88,8 +82,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @author sudnya
-     * @example
-     * String token = attuneClient.createAnonymous(authToken)
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @param anonymousId anonymousId
      * @param customerId customerId
@@ -116,8 +108,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns the customer bound to a given anonymousId, for a given auth token
      * @author sudnya
-     * @example
-     * String token = attuneClient.getBinding(anonymousId, authToken)
      * @param anonymousId anonymousId
      * @param authToken authentication token
      * @return A customer that was associated to this anonymousId with a bind call
@@ -143,8 +133,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns a ranking of the specified entities, given an auth token
      * @author sudnya
-     * @example
-     * RankedEntities rankings = client.getRankings(rankingParams, authToken)
      * @param rankingParams an object with the ranking parameters
      * @param authToken authentication token
      */
@@ -173,8 +161,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns a list of rankings of the given list of specified entities, given an auth token
      * @author sudnya
-     * @example
-     * List<RankedEntities> listOfRankings = client.batchGetRankings(rankingParamsList, authToken)
      * @param rankingParamsList list of objects with the ranking parameters
      * @param authToken authentication token
      */

@@ -194,6 +194,9 @@ public class AttuneClientTest {
 
         RankedEntities rankings = client.getRankings(rankingParams, authToken);
 
+        assertTrue(rankingParams.getEntitySource().toUpperCase().equals("IDS"));
+        System.out.println("Default entity source is ids");
+
         assertNotNull(rankings);
         System.out.println("PASS: rankings not null");
 
@@ -205,6 +208,57 @@ public class AttuneClientTest {
 
         assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
         System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
+    }
+
+
+
+    /**
+     * Method: verify that the rankings returned on a get call happened correctly and the size of the list matches the list supplied in the params
+     * @throws Exception
+     */
+    @Test
+    public void testScopeGetRankings() throws Exception {
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+
+        AnonymousResult anon = client.createAnonymous(authToken);
+        assertNotNull(anon);
+        System.out.println("PASS: anonymousResult not null");
+
+        RankingParams rankingParams = new RankingParams();
+        rankingParams.setAnonymous(anon.getId());
+        rankingParams.setView("/sales/57460");
+        rankingParams.setEntitySource("scope");
+        List<String> scopes = new ArrayList<>();
+        scopes.add("sale=57460");
+        rankingParams.setScopes(scopes); //Scope parameter that indicate what IDs to retrieve
+        rankingParams.setEntityType("products");
+        rankingParams.setApplication("event_page");
+
+        List<String> idList = new ArrayList<String>();
+        idList.add("1001");
+        idList.add("1002");
+        idList.add("1003");
+        idList.add("1004");
+
+        rankingParams.setIds(idList);
+
+        RankedEntities rankings = client.getRankings(rankingParams, authToken);
+
+        assertTrue(rankingParams.getEntitySource().toUpperCase().equals("SCOPE"));
+        System.out.println("Default entity source is ids");
+
+        assertNotNull(rankings);
+        System.out.println("PASS: rankings not null");
+
+        assertEquals(idList.size(), rankings.getRanking().size());
+        System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
+
+        client.updateFallBackToDefault(true);
+        RankedEntities defaultList = client.getRankings(rankingParams, authToken);
+
+        assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
+        System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
+
     }
 
     /**

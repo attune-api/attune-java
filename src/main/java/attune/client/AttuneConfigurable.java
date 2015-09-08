@@ -66,8 +66,6 @@ public class AttuneConfigurable {
     /**
      * Overrides the default value of the test mode
      * @author sudnya
-     * @example
-     * updateTestMode(true)
      * @param testMode
      */
     public void updateTestMode(boolean testMode) {
@@ -81,8 +79,6 @@ public class AttuneConfigurable {
     /**
      * Overrides the default value of the fallBackToDefaultMode
      * @author sudnya
-     * @example
-     * updateFallBackToDefaultMode(true)
      * @param fallBackToDefault
      */
     public void updateFallbackToDefaultMode(boolean fallBackToDefault) {
