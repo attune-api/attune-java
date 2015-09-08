@@ -41,9 +41,7 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
-        //headerParams.put("access_token", accessToken);
 
 
 
@@ -65,7 +63,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             }
@@ -93,9 +91,7 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
-        //headerParams.put("access_token", accessToken);
 
 
 
@@ -117,7 +113,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BatchRankingResult) ApiInvoker.deserialize(response, "", BatchRankingResult.class);
             }
@@ -143,9 +139,6 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
-
-
 
         String[] contentTypes = {
 
@@ -165,7 +158,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistGetResponse) ApiInvoker.deserialize(response, "", BlacklistGetResponse.class);
             }
@@ -192,9 +185,6 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
-
-
 
         String[] contentTypes = {
 
@@ -214,7 +204,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistSaveResponse) ApiInvoker.deserialize(response, "", BlacklistSaveResponse.class);
             }
@@ -241,9 +231,6 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
-
-
 
         String[] contentTypes = {
 
@@ -263,7 +250,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Blacklist) ApiInvoker.deserialize(response, "", Blacklist.class);
             }
@@ -291,9 +278,6 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
-
-
 
         String[] contentTypes = {
 
@@ -313,7 +297,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
             }
@@ -340,9 +324,6 @@ public class Entities {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
-
-
 
         String[] contentTypes = {
 
@@ -362,7 +343,7 @@ public class Entities {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "DELETE", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (BlacklistDeleteResponse) ApiInvoker.deserialize(response, "", BlacklistDeleteResponse.class);
             }

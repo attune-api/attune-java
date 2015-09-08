@@ -46,7 +46,6 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
 
         queryParams.put("access_token", auth_token);
 
@@ -68,7 +67,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
             }
@@ -96,7 +95,6 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
 
 
@@ -119,7 +117,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "GET", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (Customer) ApiInvoker.deserialize(response, "", Customer.class);
             }
@@ -147,7 +145,6 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        Map<String, String> formParams = new HashMap<String, String>();
         queryParams.put("access_token", accessToken);
 
 
@@ -170,7 +167,7 @@ public class Anonymous {
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, formParams, contentType, Version.clientVersion);
+            String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response.equals("")) {
                 BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
                 blacklistResponse.setResult(response);
