@@ -1,0 +1,38 @@
+*~
+*.class
+build
+mainGeneratedRest
+target/
+dist/
+bin/
+out/
+lib/
+
+# Package Files #
+*.war
+*.ear
+
+
+# Eclipse project files
+.classpath
+.project
+.metadata
+.settings
+
+# IntelliJ files
+.idea
+*.iml
+*.iws
+*.ipr
+
+# OSX files
+.DS_Store
+
+# Windows files
+Thumbs.db
+
+# vi swap files
+*.swp
+
+# gradle directory
+.gradle
