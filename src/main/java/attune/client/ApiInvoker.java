@@ -237,7 +237,8 @@ public class ApiInvoker {
         } catch (WebApplicationException w) {
             throw new ApiException(100, w.getMessage());
         } finally {
-            response.close();
+            if (response != null)
+                response.close();
             return retVal;
         }
     }
