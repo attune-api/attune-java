@@ -106,9 +106,7 @@ public class StressTestOKLMobileSpecial2 {
 		logger.debug(mapper.writeValueAsString(conf));
 		
 		AttuneConfigurable configurable = new AttuneConfigurable(conf.serverUrl,
-				conf.maxConns, conf.maxConnsPerSite);
-		configurable.updateConnectionTimeout(10.0);
-		configurable.updateReadTimeout(5.0);
+				conf.maxConns, conf.maxConnsPerSite, 5.0, 10.0);
 		
 		AttuneClient client = AttuneClient.getInstance(configurable);
 

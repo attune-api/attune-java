@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 
 mainClassName = System.getProperty("mainClass")
-
+if (!mainClassName) mainClassName = "attune.client.test.StressTestNormal"
 task execute(type:JavaExec) {
 	systemProperties System.getProperties()
 			

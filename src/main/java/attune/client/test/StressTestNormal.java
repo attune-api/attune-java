@@ -164,8 +164,6 @@ public class StressTestNormal {
 		
 		AttuneConfigurable configurable =
 				new AttuneConfigurable(conf.serverUrl);
-		configurable.updateReadTimeout(5.0);
-		configurable.updateConnectionTimeout(10.0);
 		
 		AttuneClient client = AttuneClient.getInstance(configurable);
 
