@@ -70,8 +70,7 @@ public class Anonymous {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
-            }
-            else {
+            } else {
                 throw new ApiException(503, "Response returned = null");
             }
         } catch (ApiException ex) {

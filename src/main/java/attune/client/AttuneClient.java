@@ -177,7 +177,7 @@ public class AttuneClient implements RankingClient  {
      * List<RankedEntities> listOfRankings = client.batchGetRankings(rankingParamsList, authToken)
      * @param rankingParamsList list of objects with the ranking parameters
      * @param authToken authentication token
-     */
+     *
     public List<RankedEntities> batchGetRankings(List<RankingParams> rankingParamsList, String authToken) throws ApiException {
         int counter = 0;
         List<RankedEntities> retVal;
@@ -201,7 +201,7 @@ public class AttuneClient implements RankingClient  {
         }
         retVal = result.getResults();
         return retVal;
-    }
+    }*/
 
 
     private RankedEntities returnDefaultRankings(RankingParams rankingParams) {
