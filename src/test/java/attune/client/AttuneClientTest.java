@@ -26,10 +26,10 @@ public class AttuneClientTest {
     AttuneConfigurable attuneConfig;
     @Before
     public void before() throws Exception {
-        this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";
-        this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5.0, 10.0);
-        //this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
-        //this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co");
+        //this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";
+        //this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5.0, 10.0);
+        this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
+        this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co");
     }
 
     @After
