@@ -1,6 +1,7 @@
 package attune.client;
 
 import attune.client.model.AnonymousResult;
+import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
 import org.junit.After;
@@ -171,7 +172,7 @@ public class AttuneClientTest {
     /**
      * Method: verify that the rankings returned on a get call happened correctly and the size of the list matches the list supplied in the params
      * @throws Exception
-     *
+     */
     @Test
     public void testGetRankings() throws Exception {
         AttuneClient client = AttuneClient.getInstance(attuneConfig);
