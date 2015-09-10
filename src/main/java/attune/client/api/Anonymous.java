@@ -71,10 +71,10 @@ public class Anonymous {
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
             } else {
-                throw new ApiException(503, "Response returned = null");
+                throw new ApiException(503, "Create anonymous response returned = null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception in creating auth token");
         }
     }
 
@@ -124,7 +124,7 @@ public class Anonymous {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception occurred when trying to retrieve customer id for anonymous: " + anonymous);
         }
     }
 
@@ -178,7 +178,7 @@ public class Anonymous {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception occurred when trying to bind customer: " + request.getCustomer() + " to anonymous: " + anonymous);
         }
     }
 

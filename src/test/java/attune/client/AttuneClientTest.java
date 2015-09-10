@@ -1,7 +1,6 @@
 package attune.client;
 
 import attune.client.model.AnonymousResult;
-import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
 import org.junit.After;
@@ -26,8 +25,10 @@ public class AttuneClientTest {
     AttuneConfigurable attuneConfig;
     @Before
     public void before() throws Exception {
-        this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";// "388dee30-394d-4a85-9e79-d951e5c3e292";
-        this.attuneConfig = new AttuneConfigurable("http://localhost:8080");//https://api.attune-staging.co");
+        this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";
+        this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5.0, 10.0);
+        //this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
+        //this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co");
     }
 
     @After
@@ -130,7 +131,7 @@ public class AttuneClientTest {
     /**
      * Method: verify that the bind happened correctly between anonymousId and customer
      * @throws Exception
-     */
+     *
     @Test
     public void testCorrectConfigParams() throws Exception {
         AttuneClient client   = AttuneClient.getInstance(attuneConfig);
@@ -145,7 +146,7 @@ public class AttuneClientTest {
     /**
      * Method: verify that the bind happened correctly between anonymousId and customer
      * @throws Exception
-     */
+     *
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
         AttuneClient client = AttuneClient.getInstance(attuneConfig);
@@ -170,7 +171,7 @@ public class AttuneClientTest {
     /**
      * Method: verify that the rankings returned on a get call happened correctly and the size of the list matches the list supplied in the params
      * @throws Exception
-     */
+     *
     @Test
     public void testGetRankings() throws Exception {
         AttuneClient client = AttuneClient.getInstance(attuneConfig);
@@ -242,6 +243,7 @@ public class AttuneClientTest {
 
         rankingParams.setIds(idList);
 
+        client.updateFallBackToDefault(true);
         RankedEntities rankings = client.getRankings(rankingParams, authToken);
 
         assertTrue(rankingParams.getEntitySource().toUpperCase().equals("SCOPE"));

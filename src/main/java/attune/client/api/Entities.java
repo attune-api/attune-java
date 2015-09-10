@@ -34,7 +34,7 @@ public class Entities {
         // create path and map variables
         String path = "/entities/ranking";
 
-        RankingParams modifiedParams = params;
+        RankingParams modifiedParams = new RankingParams(params); //params;
 
         //which method: Use GET method for the API request unless entitySource=ids
         String method = params.getEntitySource().toUpperCase().equals("IDS") ? "POST" : "GET";

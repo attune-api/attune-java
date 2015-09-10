@@ -2,7 +2,10 @@ package attune.client;
 
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
-import attune.client.model.*;
+import attune.client.model.AnonymousResult;
+import attune.client.model.Customer;
+import attune.client.model.RankedEntities;
+import attune.client.model.RankingParams;
 
 import java.util.ArrayList;
 import java.util.List;

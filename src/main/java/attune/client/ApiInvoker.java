@@ -1,12 +1,10 @@
 package attune.client;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.wordnik.swagger.annotations.Api;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -226,18 +224,14 @@ public class ApiInvoker {
                 if (response.hasEntity())
                     retVal = response.readEntity(String.class);
             } else if (response.getStatusInfo().getFamily() == Family.CLIENT_ERROR) {
-                throw new ApiException(400, "Client error occured");
+                throw new ApiException(response.getStatus(), " Client error occurred");
             } else if (response.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
-                throw new ApiException(500, "Server error");
-            } else if (response.getStatusInfo().getFamily() == Family.REDIRECTION) {
-                throw new ApiException(300, "Redirection error");
-            } else if (response.getStatusInfo().getFamily() == Family.OTHER) {
-                throw new ApiException(700, "Unrecognized error code");
+                throw new ApiException(response.getStatus(), "Server error occurred");
             }
         } catch (ProcessingException p) {
-            throw new ApiException(100, p.getMessage());
+            throw new ApiException(response.getStatus(), p.getMessage());
         } catch (WebApplicationException w) {
-            throw new ApiException(100, w.getMessage());
+            throw new ApiException(response.getStatus(), w.getMessage());
         } finally {
             if (response != null)
                 response.close();

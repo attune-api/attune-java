@@ -12,7 +12,7 @@ import java.util.List;
  * Inputs for ranking a set of ids for a particular user.
  **/
 @ApiModel(description = "Inputs for ranking a set of ids for a particular user.")
-public class RankingParams  {
+public class RankingParams implements Cloneable {
   
   private String view = null;
   private String userAgent = null;
@@ -20,12 +20,30 @@ public class RankingParams  {
   private String ip = null;
   private String entityType = null;
   private String entitySource = "ids";
-  private List<String> ids = new ArrayList<String>() ;
   private String application = null;
-  private List<Integer> quantities = new ArrayList<Integer>() ;
   private String customer = null;
+  private List<String> ids = new ArrayList<String>() ;
+  private List<Integer> quantities = new ArrayList<Integer>() ;
   private List<String> scopes = new ArrayList<>();
-  
+
+  public RankingParams() {}
+
+  //deep copy
+  public RankingParams(RankingParams that) {
+      this.view          = that.getView();
+      this.userAgent     = that.getUserAgent();
+      this.anonymous     = that.getAnonymous();
+      this.ip            = that.getIp();
+      this.entityType    = that.getEntityType();
+      this.entitySource  = that.getEntitySource();
+      this.application   = that.getApplication();
+      this.customer      = that.getCustomer();
+
+      this.ids.addAll(that.getIds());
+      this.quantities.addAll(that.getQuantities());
+      this.scopes.addAll(that.getScopes());
+  }
+
   /**
    **/
   @ApiModelProperty(value = "")
@@ -155,8 +173,6 @@ public class RankingParams  {
   public void setScopes(List<String> scopes) {
     this.scopes = scopes;
   }
-
-  
 
   @Override
   public String toString()  {
