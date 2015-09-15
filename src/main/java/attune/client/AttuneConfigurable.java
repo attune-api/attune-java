@@ -30,6 +30,11 @@ public class AttuneConfigurable {
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
+    public AttuneConfigurable(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections) {
+        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
+    }
+
     public AttuneConfigurable(String endpoint, Double readTimeout, Double connectionTimeout) {
         this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);

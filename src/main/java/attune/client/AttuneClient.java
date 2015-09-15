@@ -6,7 +6,17 @@ import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +67,42 @@ public class AttuneClient implements RankingClient  {
     public void updateTestMode(boolean testMode) {
         attuneConfigurable.updateTestMode(testMode);
     }
+
+    public String getAuthToken(String clientId, String clientSecret) throws ApiException {
+        int counter = 0;
+
+        if (clientId == null)
+            throw new IllegalArgumentException("clientId is required");
+        if (clientSecret == null)
+            throw new IllegalArgumentException("clientSecret is required");
+
+        Client client                             = ClientBuilder.newClient();
+        WebTarget authResource                    = client.target(attuneConfigurable.getEndpoint()).path("oauth/token");
+        MultivaluedMap<String, String> formData   = new MultivaluedHashMap<String, String>();
+
+        formData.add("client_id"    , clientId);
+        formData.add("client_secret", clientSecret);
+        formData.add("grant_type"   , "client_credentials");
+
+        String accessToken = null;
+        Response response  = authResource.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(formData));
+        String body        = response.readEntity(String.class);
+
+        while (true) {
+            try {
+                JSONObject json = new JSONObject(body);
+                accessToken = json.getString("access_token");
+                break;
+            } catch (JSONException e) {
+                ++counter;
+                if (counter > MAX_RETRIES) {
+                    throw new ApiException();
+                }
+            }
+        }
+        return accessToken;
+    }
+
 
     /**
      * Requests an anonymous id, given an auth token

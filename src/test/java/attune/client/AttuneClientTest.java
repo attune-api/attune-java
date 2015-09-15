@@ -40,16 +40,16 @@ public class AttuneClientTest {
     /**
      * Method: get auth token
      * @throws Exception
-     *
+     */
     @Test
     public void testAuthGetToken() throws Exception {
         long sleepSeconds = 30;
         System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds*1000L);
 
-        AttuneClient client = AttuneClient.getInstance(config);
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
 
-        assertNotNull(client.getAuthToken());
+        assertNotNull(client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66"));
         System.out.println("PASS: authToken not null");
     }
 
