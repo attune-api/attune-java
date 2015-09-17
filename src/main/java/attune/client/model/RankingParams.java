@@ -12,20 +12,38 @@ import java.util.List;
  * Inputs for ranking a set of ids for a particular user.
  **/
 @ApiModel(description = "Inputs for ranking a set of ids for a particular user.")
-public class RankingParams  {
+public class RankingParams implements Cloneable {
   
   private String view = null;
   private String userAgent = null;
   private String anonymous = null;
   private String ip = null;
   private String entityType = null;
-  private List<String> ids = new ArrayList<String>() ;
+  private String entitySource = "ids";
   private String application = null;
-  private List<Integer> quantities = new ArrayList<Integer>() ;
   private String customer = null;
-  private List<ScopeEntry> scope = new ArrayList<ScopeEntry>() ;
+  private List<String> ids = new ArrayList<String>() ;
+  private List<Integer> quantities = new ArrayList<Integer>() ;
+  private List<String> scopes = new ArrayList<>();
 
-  
+  public RankingParams() {}
+
+  //deep copy
+  public RankingParams(RankingParams that) {
+      this.view          = that.getView();
+      this.userAgent     = that.getUserAgent();
+      this.anonymous     = that.getAnonymous();
+      this.ip            = that.getIp();
+      this.entityType    = that.getEntityType();
+      this.entitySource  = that.getEntitySource();
+      this.application   = that.getApplication();
+      this.customer      = that.getCustomer();
+
+      this.ids.addAll(that.getIds());
+      this.quantities.addAll(that.getQuantities());
+      this.scopes.addAll(that.getScopes());
+  }
+
   /**
    **/
   @ApiModelProperty(value = "")
@@ -85,8 +103,19 @@ public class RankingParams  {
     this.entityType = entityType;
   }
 
-  
   /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("entitySource")
+  public String getEntitySource() {
+      return entitySource;
+  }
+
+  public void setEntitySource(String entitySource) {
+      this.entitySource = entitySource;
+  }
+
+    /**
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("ids")
@@ -138,14 +167,12 @@ public class RankingParams  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("scope")
-  public List<ScopeEntry> getScope() {
-    return scope;
+  public List<String> getScopes() {
+    return scopes;
   }
-  public void setScope(List<ScopeEntry> scope) {
-    this.scope = scope;
+  public void setScopes(List<String> scopes) {
+    this.scopes = scopes;
   }
-
-  
 
   @Override
   public String toString()  {
@@ -161,7 +188,7 @@ public class RankingParams  {
     sb.append("  application: ").append(application).append("\n");
     sb.append("  quantities: ").append(quantities).append("\n");
     sb.append("  customer: ").append(customer).append("\n");
-    sb.append("  scope: ").append(scope).append("\n");
+    sb.append("  scopes: ").append(scopes).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

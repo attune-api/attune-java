@@ -30,13 +30,13 @@ public class ApiInvoker {
 
     /**
     * ISO 8601 date time format.
-    * @see https://en.wikipedia.org/wiki/ISO_8601
+    * http://en.wikipedia.org/wiki/ISO_8601
     */
     public static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     /**
     * ISO 8601 date format.
-    * @see https://en.wikipedia.org/wiki/ISO_8601
+    * https://en.wikipedia.org/wiki/ISO_8601
     */
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -227,18 +227,14 @@ public class ApiInvoker {
                     retVal = "";
                 }
             } else if (response.getStatusInfo().getFamily() == Family.CLIENT_ERROR) {
-                throw new ApiException(400, "Client error occurred");
+                throw new ApiException(response.getStatus(), " Client error occurred");
             } else if (response.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
-                throw new ApiException(500, "Server error");
-            } else if (response.getStatusInfo().getFamily() == Family.REDIRECTION) {
-                throw new ApiException(300, "Redirection error");
-            } else if (response.getStatusInfo().getFamily() == Family.OTHER) {
-                throw new ApiException(700, "Unrecognized error code");
+                throw new ApiException(response.getStatus(), "Server error occurred");
             }
         } catch (ProcessingException p) {
-            throw new ApiException(100, p.getMessage());
+            throw new ApiException(response.getStatus(), p.getMessage());
         } catch (WebApplicationException w) {
-            throw new ApiException(100, w.getMessage());
+            throw new ApiException(response.getStatus(), w.getMessage());
         } finally {
             if (response != null)
                 response.close();
