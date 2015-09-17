@@ -160,7 +160,7 @@ public class AttuneClient implements RankingClient  {
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
-                        return returnDefaultRankings(rankingParams);
+                        return returnDefaultRankings(rankingParams, ex.getCode());
                     }
                     throw ex;
                 }
@@ -204,12 +204,13 @@ public class AttuneClient implements RankingClient  {
     }*/
 
 
-    private RankedEntities returnDefaultRankings(RankingParams rankingParams) {
+    private RankedEntities returnDefaultRankings(RankingParams rankingParams, int errorCode) {
         RankedEntities rankedEntities = new RankedEntities();
         rankedEntities.setRanking(rankingParams.getIds());
+        rankedEntities.setStatus(errorCode);
         return rankedEntities;
     }
-
+/**
     private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) {
         List<RankedEntities> rankedEntityList = new ArrayList<>();
         for (RankingParams entry : rankingParamsList) {
@@ -217,7 +218,7 @@ public class AttuneClient implements RankingClient  {
         }
         return rankedEntityList;
     }
-
+*/
     //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;

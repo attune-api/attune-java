@@ -147,34 +147,18 @@ public class Anonymous {
         queryParams.put("access_token", accessToken);
 
 
-
-        String[] contentTypes = {
-
-        };
-
-        String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-        if(contentType.startsWith("multipart/form-data")) {
-            boolean hasFields = false;
-            FormDataMultiPart mp = new FormDataMultiPart();
-
-            if(hasFields)
-                postBody = mp;
-        }
-        else {
-
-        }
+        String contentType = "application/json";
 
         try {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, contentType, Version.clientVersion);
-            if(response.equals("")) {
-                BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
-                blacklistResponse.setResult(response);
-                return blacklistResponse;
-            } else if(response != null) {
+            if (response != null) {
+                if (response.equals("")) {
+                    BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
+                    blacklistResponse.setResult(response);
+                    return blacklistResponse;
+                }
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
-            }
-            else {
+            } else {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {

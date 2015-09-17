@@ -1,12 +1,10 @@
 package attune.client;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.wordnik.swagger.annotations.Api;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -223,10 +221,13 @@ public class ApiInvoker {
             if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
                 retVal = null;
             } else if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
-                if (response.hasEntity())
+                if (response.hasEntity()) {
                     retVal = response.readEntity(String.class);
+                } else {
+                    retVal = "";
+                }
             } else if (response.getStatusInfo().getFamily() == Family.CLIENT_ERROR) {
-                throw new ApiException(400, "Client error occured");
+                throw new ApiException(400, "Client error occurred");
             } else if (response.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
                 throw new ApiException(500, "Server error");
             } else if (response.getStatusInfo().getFamily() == Family.REDIRECTION) {
