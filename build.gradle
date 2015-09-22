@@ -83,18 +83,3 @@ test {
         testLogging.showStandardStreams = true
     }
 }
-
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Main-Class': mainClassName
-    }
-    baseName = (System.getProperty("baseName")) ? System.getProperty("baseName") : "attune-java"
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-    {
-        exclude "META-INF/*.SF"
-        exclude "META-INF/*.DSA"
-        exclude "META-INF/*.RSA"
-    }
-    zip64 = true
-    with jar
-}
