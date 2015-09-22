@@ -24,7 +24,7 @@ public class RankingParams implements Cloneable {
   private String customer = null;
   private List<String> ids = new ArrayList<String>() ;
   private List<Integer> quantities = new ArrayList<Integer>() ;
-  private List<String> scopes = new ArrayList<>();
+  private String scope = null;
 
   public RankingParams() {}
 
@@ -38,10 +38,10 @@ public class RankingParams implements Cloneable {
       this.entitySource  = that.getEntitySource();
       this.application   = that.getApplication();
       this.customer      = that.getCustomer();
+      this.scope         = that.getScope();
 
       this.ids.addAll(that.getIds());
       this.quantities.addAll(that.getQuantities());
-      this.scopes.addAll(that.getScopes());
   }
 
   /**
@@ -167,11 +167,11 @@ public class RankingParams implements Cloneable {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("scope")
-  public List<String> getScopes() {
-    return scopes;
+  public String getScope() {
+    return scope;
   }
-  public void setScopes(List<String> scopes) {
-    this.scopes = scopes;
+  public void setScope(String scope) {
+    this.scope = scope;
   }
 
   @Override
@@ -188,7 +188,7 @@ public class RankingParams implements Cloneable {
     sb.append("  application: ").append(application).append("\n");
     sb.append("  quantities: ").append(quantities).append("\n");
     sb.append("  customer: ").append(customer).append("\n");
-    sb.append("  scopes: ").append(scopes).append("\n");
+    sb.append("  scope: ").append(scope).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

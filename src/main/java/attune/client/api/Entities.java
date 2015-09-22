@@ -45,7 +45,7 @@ public class Entities {
         queryParams.put("access_token", accessToken);
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
-            addScopesToQueryParams(params.getScopes(), queryParams);
+            addScopeToQueryParams(params.getScope(), queryParams);
             modifiedParams.setIds(null);
             addBodyParamsToQueryParams(modifiedParams, queryParams);
         }
@@ -98,7 +98,7 @@ public class Entities {
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {
-                addScopesToQueryParams(params.getScopes(), queryParams);
+                addScopeToQueryParams(params.getScope(), queryParams);
                 params.setIds(null);
             }
         }
@@ -328,38 +328,34 @@ public class Entities {
         }
     }
 
-    private void addScopesToQueryParams(List<String> scopes, Map<String, String> queryParams) throws ApiException {
-        if (scopes == null) {
+    private void addScopeToQueryParams(String scope, Map<String, String> queryParams) throws ApiException {
+        if (scope == null) {
             throw new ApiException(422, "Entity source is set to scope, but not scopes specified in RankingParams");
         }
 
-        for (String scope : scopes) {
-            String[] pieces = scope.split("=");
+        String[] pieces = scope.split("=");
 
-            //TODO: correct code number for this exception?
-            if (pieces.length%2 != 0) {
-                throw new ApiException(422, "scopes have to be in pairs");
-            }
-            for (int i = 0; i < pieces.length; i += 2) {
-                queryParams.put(pieces[i], pieces[i + 1]);
-            }
-
+        //TODO: correct code number for this exception?
+        if (pieces.length%2 != 0) {
+            throw new ApiException(422, "scopes have to be in pairs");
         }
+        for (int i = 0; i < pieces.length; i += 2) {
+            queryParams.put(pieces[i], pieces[i + 1]);
+        }
+
 
 
     }
 
     private void addBodyParamsToQueryParams(RankingParams body, Map<String, String>queryParams) {
 
-        queryParams.put("view", body.getView());
         queryParams.put("userAgent", body.getUserAgent());
         queryParams.put("anonymous", body.getAnonymous());
         queryParams.put("ip", body.getIp());
         queryParams.put("entityType", body.getEntityType());
         queryParams.put("application", body.getApplication());
         queryParams.put("customer", body.getCustomer());
-        queryParams.put("quantities", body.getQuantities().toString());
-        queryParams.put("scopes", body.getScopes().toString());
+        queryParams.put("scope", body.getScope());
     }
 
     private String getMethodFromBatchEntitySource(List<RankingParams> batchRankings) throws ApiException {

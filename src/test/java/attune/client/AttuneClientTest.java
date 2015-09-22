@@ -230,9 +230,7 @@ public class AttuneClientTest {
         rankingParams.setAnonymous(anon.getId());
         rankingParams.setView("/sales/57460");
         rankingParams.setEntitySource("scope");
-        List<String> scopes = new ArrayList<>();
-        scopes.add("sale=57460");
-        rankingParams.setScopes(scopes); //Scope parameter that indicate what IDs to retrieve
+        rankingParams.setScope("sale=57460"); //Scope parameter that indicate what IDs to retrieve
         rankingParams.setEntityType("products");
         rankingParams.setApplication("event_page");
 
