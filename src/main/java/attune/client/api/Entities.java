@@ -47,6 +47,7 @@ public class Entities {
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
             addScopesToQueryParams(params.getScopes(), queryParams);
             modifiedParams.setIds(null);
+            addBodyParamsToQueryParams(modifiedParams, queryParams);
         }
 
         Object body = modifiedParams;
@@ -85,7 +86,7 @@ public class Entities {
         // create path and map variables
         String path = "/entities/ranking/many";
 
-        BatchRankingRequest modifiedBatchRequest = batchRequest;
+        BatchRankingRequest modifiedBatchRequest = new BatchRankingRequest(batchRequest);
 
         //which method: GET for scopes, POST for ids
         String method = getMethodFromBatchEntitySource(batchRequest.getRequests());
@@ -346,6 +347,19 @@ public class Entities {
         }
 
 
+    }
+
+    private void addBodyParamsToQueryParams(RankingParams body, Map<String, String>queryParams) {
+
+        queryParams.put("view", body.getView());
+        queryParams.put("userAgent", body.getUserAgent());
+        queryParams.put("anonymous", body.getAnonymous());
+        queryParams.put("ip", body.getIp());
+        queryParams.put("entityType", body.getEntityType());
+        queryParams.put("application", body.getApplication());
+        queryParams.put("customer", body.getCustomer());
+        queryParams.put("quantities", body.getQuantities().toString());
+        queryParams.put("scopes", body.getScopes().toString());
     }
 
     private String getMethodFromBatchEntitySource(List<RankingParams> batchRankings) throws ApiException {

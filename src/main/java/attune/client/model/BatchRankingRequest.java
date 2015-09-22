@@ -16,6 +16,14 @@ public class BatchRankingRequest  {
   
   private List<RankingParams> requests = new ArrayList<RankingParams>() ;
 
+  public BatchRankingRequest(BatchRankingRequest that) {
+
+      List<RankingParams> temp = new ArrayList<>();
+      for (RankingParams thatOne : that.getRequests()) {
+          temp.add(new RankingParams(thatOne));
+      }
+      this.setRequests(temp);
+  }
   
   /**
    **/
