@@ -45,7 +45,7 @@ public class Entities {
         queryParams.put("access_token", accessToken);
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
-            addScopeToQueryParams(params.getScope(), queryParams);
+            //addScopeToQueryParams(params.getScope(), queryParams);
             modifiedParams.setIds(null);
             addBodyParamsToQueryParams(modifiedParams, queryParams);
         }
@@ -98,7 +98,7 @@ public class Entities {
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {
-                addScopeToQueryParams(params.getScope(), queryParams);
+                //addScopeToQueryParams(params.getScope(), queryParams);
                 params.setIds(null);
             }
         }
