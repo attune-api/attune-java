@@ -2,8 +2,21 @@ package attune.client;
 
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
-import attune.client.model.*;
+import attune.client.model.AnonymousResult;
+import attune.client.model.Customer;
+import attune.client.model.RankedEntities;
+import attune.client.model.RankingParams;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +53,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Overrides the default value of the fallBackToDefault mode
      * @author sudnya
-     * @example
-     * updateFallBackToDefault(true)
      * @param defaultFallBack
      */
     public void updateFallBackToDefault(boolean defaultFallBack) {
@@ -51,19 +62,51 @@ public class AttuneClient implements RankingClient  {
     /**
      * Overrides the default value of the test mode
      * @author sudnya
-     * @example
-     * updateTestMode(true)
      * @param testMode
      */
     public void updateTestMode(boolean testMode) {
         attuneConfigurable.updateTestMode(testMode);
     }
 
+    public String getAuthToken(String clientId, String clientSecret) throws ApiException {
+        int counter = 0;
+
+        if (clientId == null)
+            throw new IllegalArgumentException("clientId is required");
+        if (clientSecret == null)
+            throw new IllegalArgumentException("clientSecret is required");
+
+        Client client                             = ClientBuilder.newClient();
+        WebTarget authResource                    = client.target(attuneConfigurable.getEndpoint()).path("oauth/token");
+        MultivaluedMap<String, String> formData   = new MultivaluedHashMap<String, String>();
+
+        formData.add("client_id"    , clientId);
+        formData.add("client_secret", clientSecret);
+        formData.add("grant_type"   , "client_credentials");
+
+        String accessToken = null;
+        Response response  = authResource.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(formData));
+        String body        = response.readEntity(String.class);
+
+        while (true) {
+            try {
+                JSONObject json = new JSONObject(body);
+                accessToken = json.getString("access_token");
+                break;
+            } catch (JSONException e) {
+                ++counter;
+                if (counter > MAX_RETRIES) {
+                    throw new ApiException();
+                }
+            }
+        }
+        return accessToken;
+    }
+
+
     /**
      * Requests an anonymous id, given an auth token
      * @author sudnya
-     * @example
-     * String token = attuneClient.createAnonymous(authToken)
      * @param authToken authentication token
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
@@ -88,8 +131,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @author sudnya
-     * @example
-     * String token = attuneClient.createAnonymous(authToken)
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @param anonymousId anonymousId
      * @param customerId customerId
@@ -116,8 +157,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns the customer bound to a given anonymousId, for a given auth token
      * @author sudnya
-     * @example
-     * String token = attuneClient.getBinding(anonymousId, authToken)
      * @param anonymousId anonymousId
      * @param authToken authentication token
      * @return A customer that was associated to this anonymousId with a bind call
@@ -143,8 +182,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns a ranking of the specified entities, given an auth token
      * @author sudnya
-     * @example
-     * RankedEntities rankings = client.getRankings(rankingParams, authToken)
      * @param rankingParams an object with the ranking parameters
      * @param authToken authentication token
      */
@@ -160,7 +197,7 @@ public class AttuneClient implements RankingClient  {
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
-                        return returnDefaultRankings(rankingParams);
+                        return returnDefaultRankings(rankingParams, ex.getCode());
                     }
                     throw ex;
                 }
@@ -173,11 +210,9 @@ public class AttuneClient implements RankingClient  {
     /**
      * Returns a list of rankings of the given list of specified entities, given an auth token
      * @author sudnya
-     * @example
-     * List<RankedEntities> listOfRankings = client.batchGetRankings(rankingParamsList, authToken)
      * @param rankingParamsList list of objects with the ranking parameters
      * @param authToken authentication token
-     */
+     *
     public List<RankedEntities> batchGetRankings(List<RankingParams> rankingParamsList, String authToken) throws ApiException {
         int counter = 0;
         List<RankedEntities> retVal;
@@ -201,15 +236,16 @@ public class AttuneClient implements RankingClient  {
         }
         retVal = result.getResults();
         return retVal;
-    }
+    }*/
 
 
-    private RankedEntities returnDefaultRankings(RankingParams rankingParams) {
+    private RankedEntities returnDefaultRankings(RankingParams rankingParams, int errorCode) {
         RankedEntities rankedEntities = new RankedEntities();
         rankedEntities.setRanking(rankingParams.getIds());
+        rankedEntities.setStatus(errorCode);
         return rankedEntities;
     }
-
+/**
     private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) {
         List<RankedEntities> rankedEntityList = new ArrayList<>();
         for (RankingParams entry : rankingParamsList) {
@@ -217,7 +253,7 @@ public class AttuneClient implements RankingClient  {
         }
         return rankedEntityList;
     }
-
+*/
     //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;

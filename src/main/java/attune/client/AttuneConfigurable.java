@@ -30,6 +30,11 @@ public class AttuneConfigurable {
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
+    public AttuneConfigurable(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections) {
+        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
+    }
+
     public AttuneConfigurable(String endpoint, Double readTimeout, Double connectionTimeout) {
         this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
@@ -66,8 +71,6 @@ public class AttuneConfigurable {
     /**
      * Overrides the default value of the test mode
      * @author sudnya
-     * @example
-     * updateTestMode(true)
      * @param testMode
      */
     public void updateTestMode(boolean testMode) {
@@ -81,8 +84,6 @@ public class AttuneConfigurable {
     /**
      * Overrides the default value of the fallBackToDefaultMode
      * @author sudnya
-     * @example
-     * updateFallBackToDefaultMode(true)
      * @param fallBackToDefault
      */
     public void updateFallbackToDefaultMode(boolean fallBackToDefault) {

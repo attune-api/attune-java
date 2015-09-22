@@ -70,12 +70,11 @@ public class Anonymous {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "POST", queryParams, postBody, headerParams, contentType, Version.clientVersion);
             if(response != null){
                 return (AnonymousResult) ApiInvoker.deserialize(response, "", AnonymousResult.class);
-            }
-            else {
-                throw new ApiException(503, "Response returned = null");
+            } else {
+                throw new ApiException(503, "Create anonymous response returned = null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception in creating auth token");
         }
     }
 
@@ -125,7 +124,7 @@ public class Anonymous {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception occurred when trying to retrieve customer id for anonymous: " + anonymous);
         }
     }
 
@@ -148,38 +147,22 @@ public class Anonymous {
         queryParams.put("access_token", accessToken);
 
 
-
-        String[] contentTypes = {
-
-        };
-
-        String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-        if(contentType.startsWith("multipart/form-data")) {
-            boolean hasFields = false;
-            FormDataMultiPart mp = new FormDataMultiPart();
-
-            if(hasFields)
-                postBody = mp;
-        }
-        else {
-
-        }
+        String contentType = "application/json";
 
         try {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, contentType, Version.clientVersion);
-            if(response.equals("")) {
-                BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
-                blacklistResponse.setResult(response);
-                return blacklistResponse;
-            } else if(response != null) {
+            if (response != null) {
+                if (response.equals("")) {
+                    BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
+                    blacklistResponse.setResult(response);
+                    return blacklistResponse;
+                }
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
-            }
-            else {
+            } else {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {
-            throw ex;
+            throw new ApiException(ex.getCode(), "Exception occurred when trying to bind customer: " + request.getCustomer() + " to anonymous: " + anonymous);
         }
     }
 

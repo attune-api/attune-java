@@ -34,6 +34,23 @@ repositories {
     jcenter()
 }
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "eu.appsatori:gradle-fatjar-plugin:0.3"
+    }
+}
+apply plugin: "eu.appsatori.fatjar"
+
+fatJarPrepareFiles {
+    include 'META-INF/MANIFEST.MF'
+    include 'META-INF/spring.handlers'
+    include 'META-INF/spring.schemas'
+}
+
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
