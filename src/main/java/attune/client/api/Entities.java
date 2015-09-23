@@ -344,7 +344,7 @@ public class Entities {
             for (int i = 0; i < pieces.length; i += 2) {
                 if (b.length() != 0)
                     b.append("&");
-                b.append("scope=" + escapeString(pieces[i]) + "=" + escapeString(pieces[i+1]));
+                b.append("scope=" + escapeString(pieces[i]) + escapeString("=") + escapeString(pieces[i+1]));
             }
         }
         return b.toString();

@@ -149,7 +149,7 @@ public class ApiInvoker {
                 if (key.equals("scope"))
                     b.append(value);
                 else
-                    b.append(escapeString(key)).append("=").append(escapeString(value));
+                    b.append(key).append("=").append(escapeString(value));
             }
         }
         return b.toString();
