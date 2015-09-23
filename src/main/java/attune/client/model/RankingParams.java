@@ -24,24 +24,24 @@ public class RankingParams implements Cloneable {
   private String customer = null;
   private List<String> ids = new ArrayList<String>() ;
   private List<Integer> quantities = new ArrayList<Integer>() ;
-  private String scope = null;
+  private List<String> scope = new ArrayList<>();
 
   public RankingParams() {}
 
   //deep copy
-  public RankingParams(RankingParams that) {
-      this.view          = that.getView();
-      this.userAgent     = that.getUserAgent();
-      this.anonymous     = that.getAnonymous();
-      this.ip            = that.getIp();
-      this.entityType    = that.getEntityType();
-      this.entitySource  = that.getEntitySource();
-      this.application   = that.getApplication();
-      this.customer      = that.getCustomer();
-      this.scope         = that.getScope();
+    public RankingParams(RankingParams that) {
+        this.view          = that.getView();
+        this.userAgent     = that.getUserAgent();
+        this.anonymous     = that.getAnonymous();
+        this.ip            = that.getIp();
+        this.entityType    = that.getEntityType();
+        this.entitySource  = that.getEntitySource();
+        this.application   = that.getApplication();
+        this.customer      = that.getCustomer();
 
-      this.ids.addAll(that.getIds());
-      this.quantities.addAll(that.getQuantities());
+        this.ids.addAll(that.getIds());
+        this.quantities.addAll(that.getQuantities());
+        this.scope.addAll(that.getScope());
   }
 
   /**
@@ -167,10 +167,10 @@ public class RankingParams implements Cloneable {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("scope")
-  public String getScope() {
+  public List<String> getScope() {
     return scope;
   }
-  public void setScope(String scope) {
+  public void setScope(List<String> scope) {
     this.scope = scope;
   }
 

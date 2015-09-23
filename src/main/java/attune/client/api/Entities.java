@@ -7,6 +7,8 @@ import attune.client.Version;
 import attune.client.model.*;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -45,7 +47,6 @@ public class Entities {
         queryParams.put("access_token", accessToken);
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
-            //addScopeToQueryParams(params.getScope(), queryParams);
             modifiedParams.setIds(null);
             addBodyParamsToQueryParams(modifiedParams, queryParams);
         }
@@ -98,8 +99,8 @@ public class Entities {
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {
-                //addScopeToQueryParams(params.getScope(), queryParams);
                 params.setIds(null);
+                addBodyParamsToQueryParams(params, queryParams);
             }
         }
 
@@ -328,26 +329,36 @@ public class Entities {
         }
     }
 
-    private void addScopeToQueryParams(String scope, Map<String, String> queryParams) throws ApiException {
+    private String urlEncodedScopeString(List<String> scope) throws ApiException {
+        StringBuilder b = new StringBuilder();
         if (scope == null) {
             throw new ApiException(422, "Entity source is set to scope, but not scopes specified in RankingParams");
         }
 
-        String[] pieces = scope.split("=");
-
-        //TODO: correct code number for this exception?
-        if (pieces.length%2 != 0) {
-            throw new ApiException(422, "scopes have to be in pairs");
+        for (String s : scope) {
+            String[] pieces = s.split("=");
+            //TODO: correct code number for this exception?
+            if (pieces.length % 2 != 0) {
+                throw new ApiException(422, "scopes have to be in pairs");
+            }
+            for (int i = 0; i < pieces.length; i += 2) {
+                if (b.length() != 0)
+                    b.append("&");
+                b.append("scope=" + escapeString(pieces[i]) + "=" + escapeString(pieces[i+1]));
+            }
         }
-        for (int i = 0; i < pieces.length; i += 2) {
-            queryParams.put(pieces[i], pieces[i + 1]);
-        }
-
-
-
+        return b.toString();
     }
 
-    private void addBodyParamsToQueryParams(RankingParams body, Map<String, String>queryParams) {
+    private String escapeString(String str) {
+        try {
+            return URLEncoder.encode(str, "utf8").replaceAll("\\+", "%20");
+        } catch(UnsupportedEncodingException e) {
+            return str;
+        }
+    }
+
+    private void addBodyParamsToQueryParams(RankingParams body, Map<String, String>queryParams) throws ApiException {
 
         queryParams.put("userAgent", body.getUserAgent());
         queryParams.put("anonymous", body.getAnonymous());
@@ -355,7 +366,7 @@ public class Entities {
         queryParams.put("entityType", body.getEntityType());
         queryParams.put("application", body.getApplication());
         queryParams.put("customer", body.getCustomer());
-        queryParams.put("scope", body.getScope());
+        queryParams.put("scope", urlEncodedScopeString(body.getScope()));
     }
 
     private String getMethodFromBatchEntitySource(List<RankingParams> batchRankings) throws ApiException {

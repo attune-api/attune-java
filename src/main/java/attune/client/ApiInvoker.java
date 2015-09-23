@@ -145,7 +145,11 @@ public class ApiInvoker {
                     b.append("?");
                 else
                     b.append("&");
-                b.append(escapeString(key)).append("=").append(escapeString(value));
+
+                if (key.equals("scope"))
+                    b.append(value);
+                else
+                    b.append(escapeString(key)).append("=").append(escapeString(value));
             }
         }
         return b.toString();
