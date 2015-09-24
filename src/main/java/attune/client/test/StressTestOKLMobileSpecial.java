@@ -165,9 +165,9 @@ public class StressTestOKLMobileSpecial {
 			minTime = callTimes.get(0);
 			medianTime = callTimes.get(sCalls/2);
 			maxTime = callTimes.get(sCalls - 1);
-			tail90 = callTimes.get(sCalls - sCalls / 10);
-			tail95 = callTimes.get(sCalls - sCalls / 20);
-			tail99 = callTimes.get(sCalls - sCalls / 100);
+			tail90 = callTimes.get(sCalls - 1 - sCalls / 10);
+			tail95 = callTimes.get(sCalls - 1 - sCalls / 20);
+			tail99 = callTimes.get(sCalls - 1 - sCalls / 100);
 		}
 		
 		logger.debug("Total calls: " + tCalls + ", successful calls: " + sCalls
