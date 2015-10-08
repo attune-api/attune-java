@@ -173,12 +173,15 @@ public class ApiInvoker {
 
     public String invokeAPI(AttuneConfigurable attuneConfig, String path, String method, Map<String, String> queryParams, Object body,
         Map<String, String> headerParams, String contentType, String userAgent) throws ApiException {
+      
+        System.out.println(queryParams);
 
         //get client from hashmap (if already present)
         Client client      = getClient(attuneConfig);
 
         //build query string for api request
         String querystring = buildQueryFromQueryParams(queryParams);
+        System.out.println(querystring);
 
         //build a request from header
         String target      = attuneConfig.getEndpoint() + path + querystring;

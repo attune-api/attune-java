@@ -77,7 +77,7 @@ public class StressTestOKLMobileSpecial {
 			retVal.setApplication(conf.application);
 			retVal.setEntityType("products");
 			retVal.setEntitySource("scope");
-			retVal.setScopes(scopes);
+			retVal.setScope(scopes);
 			return retVal;
 		}
 
