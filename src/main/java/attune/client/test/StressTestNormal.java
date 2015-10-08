@@ -163,7 +163,7 @@ public class StressTestNormal {
 		logger.debug(mapper.writeValueAsString(conf));
 		
 		AttuneConfigurable configurable =
-				new AttuneConfigurable(conf.serverUrl);
+				new AttuneConfigurable(conf.serverUrl, 1000, 200, 10.0, 5.0);
 		
 		AttuneClient client = AttuneClient.getInstance(configurable);
 

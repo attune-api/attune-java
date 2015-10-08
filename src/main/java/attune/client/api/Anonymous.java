@@ -165,5 +165,4 @@ public class Anonymous {
             throw new ApiException(ex.getCode(), "Exception occurred when trying to bind customer: " + request.getCustomer() + " to anonymous: " + anonymous);
         }
     }
-
 }
