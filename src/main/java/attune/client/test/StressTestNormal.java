@@ -55,16 +55,18 @@ public class StressTestNormal {
 		private List<String> customers;
 		private Random random;
 		private AttuneClient client;
+		private boolean showResponse;
 
 		public TestThread(AttuneClient client, TestConfig config,
 				List<String> views, List<List<String>> entities,
-				List<String> customers) {
+				List<String> customers, boolean showResponse) {
 			this.client = client;
 			this.config = config;
 			this.views = views;
 			this.entities = entities;
 			this.customers = customers;
 			this.random = new Random();
+			this.showResponse = showResponse;
 		}
 
 		private List<RankingParams> getParams(String aId, String cId, int num) {
@@ -95,8 +97,9 @@ public class StressTestNormal {
 				//batchRankings = client.batchGetRankings(params,
 				//		config.authToken);
 				entry = client.getRankings(params.get(0), config.authToken);
-			} catch (ApiException e) {
-				logger.error(e.getMessage());
+				if (showResponse) logger.debug(mapper.writeValueAsString(entry));
+			} catch (ApiException | IOException e) {
+				if (showResponse) logger.error(e.getMessage());
 				return false;
 			}
 			long end = System.currentTimeMillis();
@@ -130,7 +133,7 @@ public class StressTestNormal {
 								getRandomCustomer(random)))
 							successfulCalls ++;
 					} catch (Exception ex) {
-						logger.error("Error : ", ex);
+						if (showResponse) logger.error("Error : ", ex);
 					}
 
 					if (random.nextDouble() > alpha)
@@ -157,7 +160,8 @@ public class StressTestNormal {
 		}
 	}
 	
-	public static void runTest(String configFile) throws Exception {
+	public static void runTest(String configFile, boolean showResponse)
+	    throws Exception {
 		TestConfig conf =  mapper.readValue(new File(configFile), TestConfig.class);
 
 		logger.debug(mapper.writeValueAsString(conf));
@@ -176,7 +180,7 @@ public class StressTestNormal {
 
 		for (int index = 0; index < conf.concurrentCustomers; index ++) {
 			TestThread test = new TestThread(client, conf, views, entities,
-					customers);
+					customers, showResponse);
 			Thread thread = new Thread(test);
 			thread.start();
 			tests.add(test);
@@ -225,6 +229,10 @@ public class StressTestNormal {
 	}
 
 	public static void main(String [] argv) throws Exception {
-		runTest(argv[0]);
+	  boolean showResponse = false;
+	  if (argv.length > 1) {
+	    showResponse = (Integer.parseInt(argv[1]) == 0);
+	  }
+		runTest(argv[0], showResponse);
 	}
 }

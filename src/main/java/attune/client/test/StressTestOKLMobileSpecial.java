@@ -6,15 +6,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import attune.client.ApiException;
@@ -26,13 +23,7 @@ import attune.client.model.RankingParams;
 public class StressTestOKLMobileSpecial {
 	private static final Logger logger =
 			LoggerFactory.getLogger(StressTestOKLMobileSpecial.class);
-	private static TypeReference<HashMap<String, List<String>>> typ =
-			new TypeReference<HashMap<String, List<String>>>(){};
 	private static ObjectMapper mapper = new ObjectMapper();
-	private static List<String> scopes = new ArrayList<String>();
-	static {
-	  scopes.add("sale=12345");
-	}
 
 	private static class TestConfig {
 		public String serverUrl;
@@ -56,13 +47,15 @@ public class StressTestOKLMobileSpecial {
 		private List<String> customers;
 		private String view;
 		private AttuneClient client;
+		private boolean showResponse;
 		
-		public CallThread(TestConfig conf, AttuneClient client, String view, 
-				List<String> customers) {
+		public CallThread(TestConfig conf, AttuneClient client, String view,
+		    List<String> customers, boolean showResponse) {
 			this.conf = conf;
 			this.customers = customers;
 			this.view = view;
 			this.client = client;
+			this.showResponse = showResponse;
 		}
 
 		private RankingParams getParams() {
@@ -70,14 +63,18 @@ public class StressTestOKLMobileSpecial {
 			int k = random.nextInt(customers.size());
 			String cid = customers.get(k);
 			String aid = random.nextInt(10000000) + "";
+			
 			retVal.setAnonymous(aid);
 			retVal.setCustomer(cid);
-			retVal.setView(view);
+			retVal.setView("sales/" + view);
 			retVal.setIds(new ArrayList<String>());
 			retVal.setApplication(conf.application);
 			retVal.setEntityType("products");
 			retVal.setEntitySource("scope");
-			retVal.setScope(scopes);
+			
+			List<String> scopes = new ArrayList<String>();
+		  scopes.add("sale=" + view);
+		  retVal.setScope(scopes);
 			return retVal;
 		}
 
@@ -92,10 +89,12 @@ public class StressTestOKLMobileSpecial {
 					long end = System.currentTimeMillis();
 					callTimes.add(end - start);
 					success.add(ranking != null);
-				} catch (ApiException e) {
+					if (showResponse) logger.debug(mapper.writeValueAsString(ranking));
+					
+				} catch (ApiException | IOException e) {
 					success.add(false);
 					callTimes.add(0l);
-					//logger.error(e.getMessage());
+					if (showResponse) logger.error(e.getMessage());
 				}
 				try {
 					Thread.sleep(conf.sleepTime);
@@ -106,7 +105,8 @@ public class StressTestOKLMobileSpecial {
 		}
 	}
 	
-	public static void runTest(String configFile) throws Exception {
+	public static void runTest(String configFile, boolean showResponse)
+	    throws Exception {
 		TestConfig conf =  mapper.readValue(new File(configFile), TestConfig.class);
 
 		logger.debug(mapper.writeValueAsString(conf));
@@ -118,14 +118,14 @@ public class StressTestOKLMobileSpecial {
 
 		List<CallThread> tests = new ArrayList<CallThread>();
 		List<Thread> threads = new ArrayList<Thread>();
-		List<List<String>> entities = new ArrayList<List<String>>();
-		List<String> views = new ArrayList<String>();
-		readEntities(conf.entityFile, views, entities, conf.numSales);
+		List<String> views = readCustomers(conf.entityFile);
 		List<String> customers = readCustomers(conf.customerFile);
 		
 		logger.debug("Start");
 		for (int i = 0; i < conf.numSales; i++) {
-			CallThread test = new CallThread(conf, client, views.get(i), customers);
+		  int viewIndex = i % views.size();
+			CallThread test = new CallThread(conf, client, views.get(viewIndex),
+			    customers, showResponse);
 			Thread thread = new Thread(test);
 			thread.start();
 			tests.add(test);
@@ -175,33 +175,6 @@ public class StressTestOKLMobileSpecial {
 				+ "-" + tail90 + "-" + tail95 + "-" + tail99 + "-" + maxTime);
 	}
 	
-	private static void readEntities(String filename, List<String> views,
-			List<List<String>> entities, int numSales) throws IOException {
-		List<String> tViews = new ArrayList<String>();
-		List<List<String>> tEntities = new ArrayList<List<String>>();
-		
-		BufferedReader br = new BufferedReader(new FileReader(filename));
-		while (true) {
-			String entity = br.readLine();
-			if (entity == null) break;
-			Map<String, List<String>> info = mapper.readValue(entity, typ);
-			for (Map.Entry<String, List<String>> entry : info.entrySet()) {
-				tViews.add(entry.getKey());
-				tEntities.add(entry.getValue());
-			}
-		}
-		br.close();
-		
-		if (tViews.size() == 0) return;
-		
-		Random rand = new Random();
-		for (int i = 0; i < numSales; i++) {
-			int index = rand.nextInt(tViews.size());
-			views.add(tViews.get(index));
-			entities.add(tEntities.get(index));
-		}
-	}
-	
 	private static List<String> readCustomers(String filename) throws IOException {
 		List<String> retVal = new ArrayList<String>();
 		BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -215,6 +188,10 @@ public class StressTestOKLMobileSpecial {
 	}
 
 	public static void main(String [] argv) throws Exception {
-		runTest(argv[0]);
+	  boolean showResponse = false;
+    if (argv.length > 1) {
+      showResponse = (Integer.parseInt(argv[1]) == 0);
+    }
+		runTest(argv[0], showResponse);
 	}
 }
