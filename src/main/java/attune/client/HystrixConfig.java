@@ -24,7 +24,7 @@ public class HystrixConfig {
 	 * @return
 	 */
 	public Map<String, Object> getParams() {
-		return (null != params)? params : ImmutableMap.of();
+		return params;//(null != params)? params : ImmutableMap.of();
 	}
 
 	public static final class Builder {
