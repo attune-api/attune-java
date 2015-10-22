@@ -1,13 +1,9 @@
 package attune.client;
 
-import attune.client.api.Anonymous;
-import attune.client.api.Entities;
-import attune.client.model.AnonymousResult;
-import attune.client.model.Customer;
-import attune.client.model.RankedEntities;
-import attune.client.model.RankingParams;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -17,8 +13,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.netflix.config.ConfigurationManager;
+import com.netflix.config.DynamicConfiguration;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
+
+import attune.client.api.Anonymous;
+import attune.client.api.Entities;
+import attune.client.hystrix.BindHystrixCommand;
+import attune.client.hystrix.GetRankingsHystrixCommand;
+import attune.client.model.AnonymousResult;
+import attune.client.model.Customer;
+import attune.client.model.RankedEntities;
+import attune.client.model.RankingParams;
 
 /**
  * Created by sudnya on 5/27/15.
@@ -48,6 +58,22 @@ public class AttuneClient implements RankingClient  {
 
         entities           = new Entities(attuneConfigurable);
         anonymous          = new Anonymous(attuneConfigurable);
+        initializeHystrixConfig(configurable);
+    }
+
+    private void initializeHystrixConfig(AttuneConfigurable configurable) {
+    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
+    	hystrixConfigBuilder = (configurable.isFallBackToDefault()) ?
+    	hystrixConfigBuilder.enableFallback():
+    	hystrixConfigBuilder.disableFallback();
+
+    	HystrixConfig hystrixConfig = hystrixConfigBuilder.build();
+    	DynamicConfiguration dynamicConfig = new DynamicConfiguration();
+        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
+    	for (Map.Entry<String, Object> entry : entries) {
+    		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
+    	}
+    	ConfigurationManager.install(dynamicConfig);
     }
 
     /**
@@ -142,6 +168,7 @@ public class AttuneClient implements RankingClient  {
         customer.setCustomer(customerId);
         while (true) {
             try {
+            	new BindHystrixCommand(anonymous, anonymousId, customer, authToken).execute();
                 anonymous.update(anonymousId, customer, authToken);
                 break;
             } catch (ApiException ex) {
@@ -191,9 +218,9 @@ public class AttuneClient implements RankingClient  {
 
         while (true) {
             try {
-                retVal = entities.getRankings(rankingParams, authToken);
+            	retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
                 break;
-            } catch (ApiException ex) {
+            } catch (HystrixRuntimeException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
