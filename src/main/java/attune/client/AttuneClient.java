@@ -64,10 +64,13 @@ public class AttuneClient implements RankingClient  {
     private void initializeHystrixConfig(AttuneConfigurable configurable) {
     	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
     	hystrixConfigBuilder = (configurable.isFallBackToDefault()) ?
-    	hystrixConfigBuilder.enableFallback():
-    	hystrixConfigBuilder.disableFallback();
+	    	hystrixConfigBuilder.enableFallback():
+	    		hystrixConfigBuilder.disableFallback();
 
-    	HystrixConfig hystrixConfig = hystrixConfigBuilder.build();
+	    
+    	HystrixConfig hystrixConfig = hystrixConfigBuilder
+    			.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout()*1000).intValue())
+    			.build();
     	DynamicConfiguration dynamicConfig = new DynamicConfiguration();
         Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
     	for (Map.Entry<String, Object> entry : entries) {

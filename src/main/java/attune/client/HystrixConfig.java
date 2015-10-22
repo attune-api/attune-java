@@ -34,9 +34,9 @@ public class HystrixConfig {
 		public Builder() {
 			configParams = Maps.newHashMap();
 			configParams.put(propertyNameStub + ".execution.isolation.strategy", "THREAD");
-			configParams.put(propertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", "THREAD");
+			configParams.put(propertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", 1000);
 			configParams.put(propertyNameStub + ".fallback.enabled", Boolean.TRUE);
-			configParams.put("hystrix.threadpool." + HYSTRIX_GROUP_NAME + ".coreSize", "10");
+			configParams.put("hystrix.threadpool." + HYSTRIX_GROUP_NAME + ".coreSize", 10);
 			configParams.put(propertyNameStub + ".circuitBreaker.enabled", Boolean.TRUE);
 			configParams.put(propertyNameStub + ".circuitBreaker.errorThresholdPercentage", 50);
 			configParams.put(propertyNameStub + ".circuitBreaker.requestVolumeThreshold", 20);
@@ -70,6 +70,11 @@ public class HystrixConfig {
 		public Builder threadPoolSize(int size) {
 			configParams.put(propertyNameStub + ".coreSize", size);
 			return this;	
+		}
+
+		public Builder withTimeoutInMilliseconds(int timeout) {
+			configParams.put(propertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", timeout);
+			return this;
 		}
 
 		/**
