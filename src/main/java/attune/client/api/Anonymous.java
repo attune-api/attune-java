@@ -9,6 +9,7 @@ import attune.client.model.BlacklistUpdateResponse;
 import attune.client.model.Customer;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +34,10 @@ public class Anonymous {
 
     /**
      * Create anonymous visitor
-     * @param auth_token authentication token
+     * @param accessToken authentication token
      * @return AnonymousResult
      */
-    public AnonymousResult create (String auth_token) throws ApiException {
+    public AnonymousResult create (String accessToken) throws ApiException {
         Object postBody = null;
 
 
@@ -47,7 +48,7 @@ public class Anonymous {
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
 
-        queryParams.put("access_token", auth_token);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         String[] contentTypes = {
 
@@ -94,7 +95,7 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
 
 
@@ -144,7 +145,7 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
 
         String contentType = "application/json";

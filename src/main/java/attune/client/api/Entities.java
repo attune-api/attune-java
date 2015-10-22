@@ -7,6 +7,7 @@ import attune.client.Version;
 import attune.client.model.*;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -44,7 +45,7 @@ public class Entities {
         Map<String, String> queryParams  = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
 
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
             modifiedParams.setIds(null);
@@ -95,7 +96,7 @@ public class Entities {
         Map<String, String> queryParams  = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
 
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {
