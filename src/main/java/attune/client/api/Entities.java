@@ -46,6 +46,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
             modifiedParams.setIds(null);
@@ -97,6 +98,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {
