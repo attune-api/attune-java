@@ -8,7 +8,7 @@ import attune.client.model.RankingParams;
 /**
  * Created by sudnya on 6/2/15.
  */
-public class MockClient implements RankingClient {
+public class FallbackClient implements RankingClient {
 
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
         return new AnonymousResult();

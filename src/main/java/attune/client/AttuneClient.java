@@ -62,23 +62,10 @@ public class AttuneClient implements RankingClient  {
         initializeHystrixConfig(configurable);
     }
 
-    private void initializeHystrixConfig(AttuneConfigurable configurable) {
-    	if (!ConfigurationManager.isConfigurationInstalled()) {
-	    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
-	
-	        hystrixConfigBuilder = (configurable.isFallBackToDefault()) ? hystrixConfigBuilder.enableFallback() : hystrixConfigBuilder.disableFallback();
-	
-	    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
-	
-	        DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
-	        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
-	
-	    	for (Map.Entry<String, Object> entry : entries) {
-	    		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
-	    	}
-    		ConfigurationManager.install(dynamicConfig);
-    	}
+    public static AttuneClient buildWith(AttuneConfigurable config) {
+        return new AttuneClient(config);
     }
+
 
     /**
      * Overrides the default value of the fallBackToDefault mode
@@ -141,21 +128,7 @@ public class AttuneClient implements RankingClient  {
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
-        int counter = 0;
-        AnonymousResult retVal;
-
-        while (true) {
-            try {
-                new CreateAnonymousHystrixCommand(anonymous, authToken).execute();
-                retVal = anonymous.create(authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        AnonymousResult retVal = new CreateAnonymousHystrixCommand(anonymous, authToken).execute();
         return retVal;
     }
 
@@ -167,21 +140,9 @@ public class AttuneClient implements RankingClient  {
      * @param authToken authentication token
      */
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
-        int counter = 0;
         Customer customer = new Customer();
         customer.setCustomer(customerId);
-        while (true) {
-            try {
-            	new BindHystrixCommand(anonymous, anonymousId, customer, authToken).execute();
-                anonymous.update(anonymousId, customer, authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        new BindHystrixCommand(anonymous, anonymousId, customer, authToken).execute();
     }
 
 
@@ -193,21 +154,7 @@ public class AttuneClient implements RankingClient  {
      * @return A customer that was associated to this anonymousId with a bind call
      */
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
-        int counter = 0;
-        Customer retVal;
-
-        while (true) {
-            try {
-                new GetBoundCustomerHystrixCommand(anonymous, anonymousId, authToken);
-                retVal = anonymous.get(anonymousId, authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        Customer retVal = new GetBoundCustomerHystrixCommand(anonymous, anonymousId, authToken).execute();
         return retVal;
     }
 
@@ -264,13 +211,23 @@ public class AttuneClient implements RankingClient  {
         return rankedEntityList;
     }
 */
-    //TODO: this is for junit test purpose only, hence don't generate javadoc
-    protected AttuneConfigurable getAttuneConfigurable() {
-        return this.attuneConfigurable;
+
+    private void initializeHystrixConfig(AttuneConfigurable configurable) {
+        if (!ConfigurationManager.isConfigurationInstalled()) {
+            HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
+
+            hystrixConfigBuilder = (configurable.isFallBackToDefault()) ? hystrixConfigBuilder.enableFallback() : hystrixConfigBuilder.disableFallback();
+
+            HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
+
+            DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
+            Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
+
+            for (Map.Entry<String, Object> entry : entries) {
+                dynamicConfig.addProperty(entry.getKey(), entry.getValue());
+            }
+            ConfigurationManager.install(dynamicConfig);
+        }
     }
 
-
-    public static AttuneClient buildWith(AttuneConfigurable config) {
-    	return new AttuneClient(config);
-    }
 }
