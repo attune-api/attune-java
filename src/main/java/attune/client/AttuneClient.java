@@ -218,23 +218,7 @@ public class AttuneClient implements RankingClient  {
      * @param authToken authentication token
      */
     public RankedEntities getRankings(RankingParams rankingParams, String authToken) throws ApiException {
-        int counter = 0;
-        RankedEntities retVal;
-
-        while (true) {
-            try {
-            	retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
-                break;
-            } catch (HystrixRuntimeException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    if (attuneConfigurable.isFallBackToDefault()) {
-                       // return returnDefaultRankings(rankingParams, ex.getCode());
-                    }
-                    throw ex;
-                }
-            }
-        }
+        RankedEntities retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
         return retVal;
     }
 
