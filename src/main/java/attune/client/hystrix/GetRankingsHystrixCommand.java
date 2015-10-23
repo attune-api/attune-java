@@ -2,8 +2,8 @@ package attune.client.hystrix;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.exception.HystrixRuntimeException;
 
+import attune.client.ApiException;
 import attune.client.AttuneClient;
 import attune.client.HystrixConfig;
 import attune.client.api.Entities;
@@ -32,7 +32,7 @@ public class GetRankingsHystrixCommand extends HystrixCommand<RankedEntities> {
             try {
             	retVal = entities.getRankings(params, accessToken);
                 break;
-            } catch (HystrixRuntimeException ex) {
+            } catch (ApiException ex) {
                 ++counter;
                 if (counter > AttuneClient.MAX_RETRIES) {
                     throw ex;
