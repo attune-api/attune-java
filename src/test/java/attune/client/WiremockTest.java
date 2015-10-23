@@ -6,10 +6,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,6 +16,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class WiremockTest {
 	@Rule
@@ -38,12 +36,15 @@ public class WiremockTest {
 
 	private String authToken;
 	private AttuneConfigurable attuneConfig;
+	private AttuneClient attuneClient;
 	@Before
     public void before() throws Exception {
-        this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
+        this.authToken  = "some-auth-token";
         this.attuneConfig = new AttuneConfigurable("http://localhost:8089");
+        attuneClient = AttuneClient.buildWith(attuneConfig);
     }
 
+	/** == getRankings tests begin == **/
 	@Test
 	public void getRankingsTest() throws ApiException {
 		stubFor(post(urlPathMatching("/entities/ranking.*"))
@@ -52,21 +53,8 @@ public class WiremockTest {
 		    .withHeader("Content-Type", "application/json")
 		    .withBodyFile("GetRankings-positive.json")));
 		
-		AttuneClient client = AttuneClient.getInstance(attuneConfig);
-		RankingParams rankingParams = new RankingParams();
-        rankingParams.setAnonymous("anon-id");
-        rankingParams.setView("b/mens-pants");
-        rankingParams.setEntityType("products");
-
-        List<String> idList = new ArrayList<String>();
-        idList.add("1001");
-        idList.add("1002");
-        idList.add("1003");
-        idList.add("1004");
-
-        rankingParams.setIds(idList);
-
-        RankedEntities rankings = client.getRankings(rankingParams, authToken);
+		RankingParams rankingParams = buildRankingParams("1001", "1002", "1003", "1004");
+        RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly("some","valid","values","from","mock","server");
         assertThat(rankings.getCell()).isEqualTo("wiremocktest-postive");
@@ -78,19 +66,9 @@ public class WiremockTest {
 			.willReturn(aResponse()
 		    .withStatus(500)));
 		
-		AttuneClient client = AttuneClient.getInstance(attuneConfig);
-		RankingParams rankingParams = new RankingParams();
-        rankingParams.setAnonymous("anon-id");
-        rankingParams.setView("b/mens-pants");
-        rankingParams.setEntityType("products");
+		RankingParams rankingParams = buildRankingParams("testing", "fallback");
 
-        List<String> idList = new ArrayList<String>();
-        idList.add("testing");
-        idList.add("fallback");
-
-        rankingParams.setIds(idList);
-
-        RankedEntities rankings = client.getRankings(rankingParams, authToken);
+        RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly("testing", "fallback");
         assertThat(rankings.getCell()).isNull();
@@ -105,21 +83,21 @@ public class WiremockTest {
 		    .withHeader("Content-Type", "application/json")
 		    .withBodyFile("invalid-json.txt")));
 		
-		AttuneClient client = AttuneClient.getInstance(attuneConfig);
-		RankingParams rankingParams = new RankingParams();
-        rankingParams.setAnonymous("anon-id");
-        rankingParams.setView("b/mens-pants");
-        rankingParams.setEntityType("products");
-
-        List<String> idList = new ArrayList<String>();
-        idList.add("invalid");
-        idList.add("json");
-
-        rankingParams.setIds(idList);
-
-        RankedEntities rankings = client.getRankings(rankingParams, authToken);
+		RankingParams rankingParams = buildRankingParams("invalid", "json");
+        RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly("invalid", "json");
         assertThat(rankings.getCell()).isNull();
 	}
+
+	private RankingParams buildRankingParams(String... idList) {
+		RankingParams rankingParams = new RankingParams();
+        rankingParams.setAnonymous("anon-id");
+        rankingParams.setView("b/mens-pants");
+        rankingParams.setEntityType("products");
+        rankingParams.setIds(Lists.newArrayList(idList));
+        return rankingParams;
+	}
+	/** == getRankings tests end == **/
+
 }

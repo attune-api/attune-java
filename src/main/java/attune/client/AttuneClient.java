@@ -34,13 +34,14 @@ import attune.client.model.RankingParams;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
-    private final int MAX_RETRIES = 1;
+    public static final int MAX_RETRIES = 1;
 
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
     private static AttuneClient instance;
 
+    @Deprecated
     public static AttuneClient getInstance(AttuneConfigurable configurable) {
         if (instance == null) {
             //double checked locking for thread safe singleton
@@ -62,19 +63,21 @@ public class AttuneClient implements RankingClient  {
     }
 
     private void initializeHystrixConfig(AttuneConfigurable configurable) {
-    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
-
-        hystrixConfigBuilder = (configurable.isFallBackToDefault()) ? hystrixConfigBuilder.enableFallback() : hystrixConfigBuilder.disableFallback();
-
-    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
-
-        DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
-        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
-
-    	for (Map.Entry<String, Object> entry : entries) {
-    		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
+    	if (!ConfigurationManager.isConfigurationInstalled()) {
+	    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
+	
+	        hystrixConfigBuilder = (configurable.isFallBackToDefault()) ? hystrixConfigBuilder.enableFallback() : hystrixConfigBuilder.disableFallback();
+	
+	    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
+	
+	        DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
+	        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
+	
+	    	for (Map.Entry<String, Object> entry : entries) {
+	    		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
+	    	}
+    		ConfigurationManager.install(dynamicConfig);
     	}
-    	ConfigurationManager.install(dynamicConfig);
     }
 
     /**
@@ -220,14 +223,13 @@ public class AttuneClient implements RankingClient  {
 
         while (true) {
             try {
-            	new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
-                retVal = entities.getRankings(rankingParams, authToken);
+            	retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
                 break;
-            } catch (ApiException ex) {
+            } catch (HystrixRuntimeException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
-                        return returnDefaultRankings(rankingParams, ex.getCode());
+                       // return returnDefaultRankings(rankingParams, ex.getCode());
                     }
                     throw ex;
                 }
@@ -269,12 +271,6 @@ public class AttuneClient implements RankingClient  {
     }*/
 
 
-    private RankedEntities returnDefaultRankings(RankingParams rankingParams, int errorCode) {
-        RankedEntities rankedEntities = new RankedEntities();
-        rankedEntities.setRanking(rankingParams.getIds());
-        rankedEntities.setStatus(errorCode);
-        return rankedEntities;
-    }
 /**
     private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) {
         List<RankedEntities> rankedEntityList = new ArrayList<>();
@@ -287,5 +283,10 @@ public class AttuneClient implements RankingClient  {
     //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;
+    }
+
+
+    public static AttuneClient buildWith(AttuneConfigurable config) {
+    	return new AttuneClient(config);
     }
 }

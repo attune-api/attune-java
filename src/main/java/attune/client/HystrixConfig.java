@@ -12,7 +12,7 @@ import com.google.common.collect.Maps;
  */
 public class HystrixConfig {
 
-	private static final String HYSTRIX_GROUP_NAME = "attune-client";
+	public static final String HYSTRIX_GROUP_NAME = "attune-client";
 	private final Map<String, Object> params;
 
 	private HystrixConfig(Map<String, Object> params) {
