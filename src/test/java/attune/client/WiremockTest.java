@@ -8,7 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
@@ -52,11 +52,12 @@ public class WiremockTest {
 	/** == getRankings tests begin == **/
 	@Test
 	public void getRankingsTest() throws ApiException {
-		stubFor(post(urlPathMatching("/entities/ranking.*"))
+		stubFor(post(urlEqualTo("/entities/ranking"))
 			.willReturn(aResponse()
-		    .withStatus(200)
-		    .withHeader("Content-Type", "application/json")
-		    .withBodyFile("GetRankings-positive.json")));
+			    .withStatus(200)
+			    .withHeader("Content-Type", "application/json")
+			    .withBodyFile("GetRankings-positive.json")));
+			    //.withBody("{\"ranking\":[\"some\",\"valid\",\"values\",\"from\",\"mock\",\"server\"],\"cell\":\"wiremocktest-postive\"}")));
 
 		final String[] idList = {"1001", "1002", "1003", "1004"};
 		RankingParams rankingParams = buildRankingParams(idList);
@@ -70,9 +71,9 @@ public class WiremockTest {
 
 	@Test
 	public void getRankingsFallbackTest() throws ApiException {
-		stubFor(post(urlPathMatching("/entities/ranking.*"))
+		stubFor(post(urlEqualTo("/entities/ranking"))
 			.willReturn(aResponse()
-		    .withStatus(500)));
+					.withStatus(500)));
 		final String[] idList = {"testing", "fallback"};
 		RankingParams rankingParams = buildRankingParams(idList);
 
@@ -88,11 +89,11 @@ public class WiremockTest {
 
 	@Test
 	public void getRankingsBadResponseTest() throws ApiException {
-		stubFor(post(urlPathMatching("/entities/ranking.*"))
+		stubFor(post(urlEqualTo("/entities/ranking"))
 			.willReturn(aResponse()
-		    .withStatus(200)
-		    .withHeader("Content-Type", "application/json")
-		    .withBodyFile("invalid-json.txt")));
+			    .withStatus(200)
+			    .withHeader("Content-Type", "application/json")
+			    .withBodyFile("invalid-json.txt")));
 
 		final String[] idList = {"invalid", "json"};
 		RankingParams rankingParams = buildRankingParams(idList);
@@ -114,12 +115,12 @@ public class WiremockTest {
 	}
 	
 	private void ensureNoRankingCallsSoFar() {
-		verify(0, postRequestedFor(urlPathMatching("/entities/ranking.*")));
+		verify(0, postRequestedFor(urlEqualTo("/entities/ranking")));
 	}
 
 	private void verifyRankingCall(String... idList) {
 		for (String id:idList) { // better way to do this..?
-			verify(postRequestedFor(urlPathMatching("/entities/ranking.*"))
+			verify(postRequestedFor(urlEqualTo("/entities/ranking"))
         		.withHeader("Content-Type", equalTo("application/json"))
         		.withRequestBody(containing(id)));
 		}
