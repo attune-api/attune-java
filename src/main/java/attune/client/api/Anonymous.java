@@ -9,6 +9,7 @@ import attune.client.model.BlacklistUpdateResponse;
 import attune.client.model.Customer;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +34,10 @@ public class Anonymous {
 
     /**
      * Create anonymous visitor
-     * @param auth_token authentication token
+     * @param accessToken authentication token
      * @return AnonymousResult
      */
-    public AnonymousResult create (String auth_token) throws ApiException {
+    public AnonymousResult create (String accessToken) throws ApiException {
         Object postBody = null;
 
 
@@ -47,7 +48,7 @@ public class Anonymous {
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
 
-        queryParams.put("access_token", auth_token);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         String[] contentTypes = {
 
@@ -94,7 +95,7 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
 
 
@@ -144,37 +145,21 @@ public class Anonymous {
         // query params
         Map<String, String> queryParams = new HashMap<String, String>();
         Map<String, String> headerParams = new HashMap<String, String>();
-        queryParams.put("access_token", accessToken);
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
 
-
-        String[] contentTypes = {
-
-        };
-
-        String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-        if(contentType.startsWith("multipart/form-data")) {
-            boolean hasFields = false;
-            FormDataMultiPart mp = new FormDataMultiPart();
-
-            if(hasFields)
-                postBody = mp;
-        }
-        else {
-
-        }
+        String contentType = "application/json";
 
         try {
             String response = apiInvoker.invokeAPI(attuneConfig, path, "PUT", queryParams, postBody, headerParams, contentType, Version.clientVersion);
-            if(response.equals("")) {
-                BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
-                blacklistResponse.setResult(response);
-                return blacklistResponse;
-            } else if(response != null) {
+            if (response != null) {
+                if (response.equals("")) {
+                    BlacklistUpdateResponse blacklistResponse = new BlacklistUpdateResponse();
+                    blacklistResponse.setResult(response);
+                    return blacklistResponse;
+                }
                 return (BlacklistUpdateResponse) ApiInvoker.deserialize(response, "", BlacklistUpdateResponse.class);
-            }
-            else {
+            } else {
                 throw new ApiException(503, "Response returned null");
             }
         } catch (ApiException ex) {

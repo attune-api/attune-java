@@ -1,7 +1,5 @@
 package attune.client;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +12,8 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import attune.client.hystrix.CreateAnonymousHystrixCommand;
+import attune.client.hystrix.GetBoundCustomerHystrixCommand;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -55,24 +55,22 @@ public class AttuneClient implements RankingClient  {
 
     private AttuneClient(AttuneConfigurable configurable) {
         attuneConfigurable = configurable;
-
         entities           = new Entities(attuneConfigurable);
         anonymous          = new Anonymous(attuneConfigurable);
+
         initializeHystrixConfig(configurable);
     }
 
     private void initializeHystrixConfig(AttuneConfigurable configurable) {
     	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
-    	hystrixConfigBuilder = (configurable.isFallBackToDefault()) ?
-	    	hystrixConfigBuilder.enableFallback():
-	    		hystrixConfigBuilder.disableFallback();
 
-	    
-    	HystrixConfig hystrixConfig = hystrixConfigBuilder
-    			.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout()*1000).intValue())
-    			.build();
-    	DynamicConfiguration dynamicConfig = new DynamicConfiguration();
+        hystrixConfigBuilder = (configurable.isFallBackToDefault()) ? hystrixConfigBuilder.enableFallback() : hystrixConfigBuilder.disableFallback();
+
+    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
+
+        DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
         Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
+
     	for (Map.Entry<String, Object> entry : entries) {
     		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
     	}
@@ -145,6 +143,7 @@ public class AttuneClient implements RankingClient  {
 
         while (true) {
             try {
+                new CreateAnonymousHystrixCommand(anonymous, authToken).execute();
                 retVal = anonymous.create(authToken);
                 break;
             } catch (ApiException ex) {
@@ -160,7 +159,6 @@ public class AttuneClient implements RankingClient  {
     /**
      * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @author sudnya
-     * Binds one actor to another, allowing activities of those actors to be shared between the two.
      * @param anonymousId anonymousId
      * @param customerId customerId
      * @param authToken authentication token
@@ -197,6 +195,7 @@ public class AttuneClient implements RankingClient  {
 
         while (true) {
             try {
+                new GetBoundCustomerHystrixCommand(anonymous, anonymousId, authToken);
                 retVal = anonymous.get(anonymousId, authToken);
                 break;
             } catch (ApiException ex) {
@@ -221,13 +220,14 @@ public class AttuneClient implements RankingClient  {
 
         while (true) {
             try {
-            	retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
+            	new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
+                retVal = entities.getRankings(rankingParams, authToken);
                 break;
-            } catch (HystrixRuntimeException ex) {
+            } catch (ApiException ex) {
                 ++counter;
                 if (counter > MAX_RETRIES) {
                     if (attuneConfigurable.isFallBackToDefault()) {
-                        return returnDefaultRankings(rankingParams);
+                        return returnDefaultRankings(rankingParams, ex.getCode());
                     }
                     throw ex;
                 }
@@ -269,12 +269,13 @@ public class AttuneClient implements RankingClient  {
     }*/
 
 
-    private RankedEntities returnDefaultRankings(RankingParams rankingParams) {
+    private RankedEntities returnDefaultRankings(RankingParams rankingParams, int errorCode) {
         RankedEntities rankedEntities = new RankedEntities();
         rankedEntities.setRanking(rankingParams.getIds());
+        rankedEntities.setStatus(errorCode);
         return rankedEntities;
     }
-
+/**
     private List<RankedEntities> returnBatchDefaultRankings(List<RankingParams> rankingParamsList) {
         List<RankedEntities> rankedEntityList = new ArrayList<>();
         for (RankingParams entry : rankingParamsList) {
@@ -282,7 +283,7 @@ public class AttuneClient implements RankingClient  {
         }
         return rankedEntityList;
     }
-
+*/
     //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;

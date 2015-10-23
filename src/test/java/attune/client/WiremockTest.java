@@ -27,11 +27,11 @@ public class WiremockTest {
 	@Test
 	public void bindTest() {
 		stubFor(get(urlPathMatching("/anonymous/.*"))
-	            .withHeader("Accept", equalTo("application/json"))
-	            .willReturn(aResponse()
-	                .withStatus(200)
-	                .withHeader("Content-Type", "text/xml")
-	                .withBody("<response>Some content</response>")));
+            .withHeader("Accept", equalTo("application/json"))
+            .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "text/xml")
+            .withBody("<response>Some content</response>")));
 
 	
 	}
@@ -40,8 +40,6 @@ public class WiremockTest {
 	private AttuneConfigurable attuneConfig;
 	@Before
     public void before() throws Exception {
-        //this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";
-        //this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5.0, 10.0);
         this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
         this.attuneConfig = new AttuneConfigurable("http://localhost:8089");
     }
@@ -49,11 +47,10 @@ public class WiremockTest {
 	@Test
 	public void getRankingsTest() throws ApiException {
 		stubFor(post(urlPathMatching("/entities/ranking.*"))
-				//.withHeader("Accept", equalTo("application/json"))
-				.willReturn(aResponse()
-		                .withStatus(200)
-		                .withHeader("Content-Type", "application/json")
-		                .withBodyFile("GetRankings-positive.json")));
+			.willReturn(aResponse()
+		    .withStatus(200)
+		    .withHeader("Content-Type", "application/json")
+		    .withBodyFile("GetRankings-positive.json")));
 		
 		AttuneClient client = AttuneClient.getInstance(attuneConfig);
 		RankingParams rankingParams = new RankingParams();
@@ -78,9 +75,8 @@ public class WiremockTest {
 	@Test
 	public void getRankingsFallbackTest() throws ApiException {
 		stubFor(post(urlPathMatching("/entities/ranking.*"))
-				//.withHeader("Accept", equalTo("application/json"))
-				.willReturn(aResponse()
-		                .withStatus(500)));
+			.willReturn(aResponse()
+		    .withStatus(500)));
 		
 		AttuneClient client = AttuneClient.getInstance(attuneConfig);
 		RankingParams rankingParams = new RankingParams();
@@ -104,11 +100,10 @@ public class WiremockTest {
 	@Test
 	public void getRankingsBadResponseTest() throws ApiException {
 		stubFor(post(urlPathMatching("/entities/ranking.*"))
-				//.withHeader("Accept", equalTo("application/json"))
-				.willReturn(aResponse()
-		                .withStatus(200)
-		                .withHeader("Content-Type", "application/json")
-		                .withBodyFile("invalid-json.txt")));
+			.willReturn(aResponse()
+		    .withStatus(200)
+		    .withHeader("Content-Type", "application/json")
+		    .withBodyFile("invalid-json.txt")));
 		
 		AttuneClient client = AttuneClient.getInstance(attuneConfig);
 		RankingParams rankingParams = new RankingParams();

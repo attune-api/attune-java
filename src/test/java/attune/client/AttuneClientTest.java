@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -26,8 +27,8 @@ public class AttuneClientTest {
     AttuneConfigurable attuneConfig;
     @Before
     public void before() throws Exception {
-        //this.authToken  = "4d5c2671-cee6-4f1f-b3bb-13648728b62d";
-        //this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5.0, 10.0);
+        //this.authToken  = "cf5853d5-413a-4c5e-9d0b-1e7d7ad35911";
+        //this.attuneConfig = new AttuneConfigurable("http://localhost:8765");//, 5.0, 10.0);
         this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
         this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co");
     }
@@ -43,7 +44,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testAuthGetToken() throws Exception {
-        long sleepSeconds = 30;
+        long sleepSeconds = 5;
         System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds*1000L);
 
@@ -56,15 +57,15 @@ public class AttuneClientTest {
     /**
      * Method: test a anonymous get request
      * @throws Exception
-     *
+     */
     @Test
     public void testCreateAnonymous() throws Exception {
-        long sleepSeconds = 30;
+        long sleepSeconds = 5;
         System.out.println("testAnonymousCreate: Sleep for  " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        AttuneClient client = AttuneClient.getInstance(config);
-        String authToken    = client.getAuthToken();
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -76,16 +77,16 @@ public class AttuneClientTest {
     /**
      * Method: test a binding call request
      * @throws Exception
-     *
+     */
     @Test
     public void testBind() throws Exception {
-        long sleepSeconds = 30;
+        long sleepSeconds = 5;
 
         System.out.println("testBind: Sleep for  " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        AttuneClient client = AttuneClient.getInstance(config);
-        String authToken    = client.getAuthToken();
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -102,16 +103,16 @@ public class AttuneClientTest {
     /**
      * Method: get customer id bound to an anonymous id
      * @throws Exception
-     *
+     */
     @Test
     public void testGetBoundCustomer() throws Exception {
-        long sleepSeconds = 30;
-        AttuneClient client = AttuneClient.getInstance(config);
+        long sleepSeconds = 5;
+        AttuneClient client = AttuneClient.getInstance(attuneConfig);
 
         System.out.println("testBoundCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        String authToken = client.getAuthToken();
+        String authToken = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
 
@@ -147,7 +148,7 @@ public class AttuneClientTest {
     /**
      * Method: verify that the bind happened correctly between anonymousId and customer
      * @throws Exception
-     *
+     */
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
         AttuneClient client = AttuneClient.getInstance(attuneConfig);
@@ -213,7 +214,6 @@ public class AttuneClientTest {
     }
 
 
-
     /**
      * Method: verify that the rankings returned on a get call happened correctly and the size of the list matches the list supplied in the params
      * @throws Exception
@@ -230,9 +230,13 @@ public class AttuneClientTest {
         rankingParams.setAnonymous(anon.getId());
         rankingParams.setView("/sales/57460");
         rankingParams.setEntitySource("scope");
-        List<String> scopes = new ArrayList<>();
-        scopes.add("sale=57460");
-        rankingParams.setScopes(scopes); //Scope parameter that indicate what IDs to retrieve
+
+        List<String> scope = new ArrayList<>();
+        scope.add("sale=57460");
+        scope.add("color=red");
+        scope.add("size=M");
+        rankingParams.setScope(scope); //Scope parameter that indicate what IDs to retrieve
+
         rankingParams.setEntityType("products");
         rankingParams.setApplication("event_page");
 

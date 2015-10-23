@@ -5,6 +5,8 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.filter.EncodingFilter;
+import org.glassfish.jersey.message.GZipEncoder;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -13,6 +15,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
@@ -145,14 +148,17 @@ public class ApiInvoker {
                     b.append("?");
                 else
                     b.append("&");
-                b.append(escapeString(key)).append("=").append(escapeString(value));
+
+                if (key.equals("scope"))
+                    b.append(value);
+                else
+                    b.append(key).append("=").append(escapeString(value));
             }
         }
         return b.toString();
     }
 
     private Builder getBuilderWithCorrectHeader(Client client, Map<String, String>headerParams, String target) {
-        //Builder builder = client.resource(host + path + querystring).accept("application/json");
         WebTarget webTarget = client.target(target);
         Builder builder     = webTarget.request(MediaType.APPLICATION_JSON);
         for(String key : headerParams.keySet()) {
@@ -180,6 +186,10 @@ public class ApiInvoker {
         String target      = attuneConfig.getEndpoint() + path + querystring;
         Builder builder    = getBuilderWithCorrectHeader(client, headerParams, target);
 
+        boolean gzipOn = "gzip".equals(headerParams.get(HttpHeaders.CONTENT_ENCODING)) ? true : false;
+        if (gzipOn) {
+            builder.acceptEncoding("gzip");
+        }
         // categorize request into GET, PUT, POST and accordingly do varying things
         String retVal       = null;
         Response response   = null;
@@ -221,8 +231,11 @@ public class ApiInvoker {
             if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
                 retVal = null;
             } else if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
-                if (response.hasEntity())
+                if (response.hasEntity()) {
                     retVal = response.readEntity(String.class);
+                } else {
+                    retVal = "";
+                }
             } else if (response.getStatusInfo().getFamily() == Family.CLIENT_ERROR) {
                 throw new ApiException(response.getStatus(), " Client error occurred");
             } else if (response.getStatusInfo().getFamily() == Family.SERVER_ERROR) {

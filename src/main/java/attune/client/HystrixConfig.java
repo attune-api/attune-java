@@ -24,12 +24,12 @@ public class HystrixConfig {
 	 * @return
 	 */
 	public Map<String, Object> getParams() {
-		return params;//(null != params)? params : ImmutableMap.of();
+		return params;
 	}
 
 	public static final class Builder {
 		private final Map<String, Object> configParams;
-		final String propertyNameStub = "hystrix.command."+HYSTRIX_GROUP_NAME;
+		final String propertyNameStub = "hystrix.command." + HYSTRIX_GROUP_NAME;
 
 		public Builder() {
 			configParams = Maps.newHashMap();
