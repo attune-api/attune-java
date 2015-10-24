@@ -23,108 +23,109 @@ import attune.client.model.RankingParams;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 public class WiremockTest {
-	@Rule
-	public WireMockRule wireMockRule = new WireMockRule(8089);
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(8089);
 
-	@Test
-	public void bindTest() {
-		stubFor(get(urlPathMatching("/anonymous/.*"))
+    @Test
+    public void bindTest() {
+        stubFor(get(urlPathMatching("/anonymous/.*"))
             .withHeader("Accept", equalTo("application/json"))
             .willReturn(aResponse()
             .withStatus(200)
             .withHeader("Content-Type", "text/xml")
             .withBody("<response>Some content</response>")));
 
-	
-	}
+    }
 
-	private String authToken;
-	private AttuneConfigurable attuneConfig;
-	private AttuneClient attuneClient;
-	@Before
+    private String authToken;
+    private AttuneConfigurable attuneConfig;
+    private AttuneClient attuneClient;
+
+    @Before
     public void before() throws Exception {
-        this.authToken  = "some-auth-token";
-        this.attuneConfig = new AttuneConfigurable("http://localhost:8089");
-        attuneClient = AttuneClient.buildWith(attuneConfig);
+        this.authToken     = "some-auth-token";
+        this.attuneConfig  = new AttuneConfigurable("http://localhost:8089");
+        attuneClient       = AttuneClient.buildWith(attuneConfig);
         WireMock.resetAllRequests();
     }
 
-	/** == getRankings tests begin == **/
-	@Test
-	public void getRankingsTest() throws ApiException {
-		stubFor(post(urlEqualTo("/entities/ranking"))
-			.willReturn(aResponse()
-			    .withStatus(200)
-			    .withHeader("Content-Type", "application/json")
-			    .withBodyFile("GetRankings-positive.json")));
-			    //.withBody("{\"ranking\":[\"some\",\"valid\",\"values\",\"from\",\"mock\",\"server\"],\"cell\":\"wiremocktest-postive\"}")));
+    /** == getRankings tests begin == **/
+    @Test
+    public void getRankingsTest() throws ApiException {
+        stubFor(post(urlEqualTo("/entities/ranking"))
+            .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("GetRankings-positive.json")));
+        //.withBody("{\"ranking\":[\"some\",\"valid\",\"values\",\"from\",\"mock\",\"server\"],\"cell\":\"wiremocktest-postive\"}")));
 
-		final String[] idList = {"1001", "1002", "1003", "1004"};
-		RankingParams rankingParams = buildRankingParams(idList);
-		ensureNoRankingCallsSoFar();
+        final String[] idList = {"1001", "1002", "1003", "1004"};
+        RankingParams rankingParams = buildRankingParams(idList);
+        ensureNoRankingCallsSoFar();
         RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         verifyRankingCall(idList);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly("some","valid","values","from","mock","server");
         assertThat(rankings.getCell()).isEqualTo("wiremocktest-postive");
-	}
+    }
 
-	@Test
-	public void getRankingsFallbackTest() throws ApiException {
-		stubFor(post(urlEqualTo("/entities/ranking"))
-			.willReturn(aResponse()
-					.withStatus(500)));
-		final String[] idList = {"testing", "fallback"};
-		RankingParams rankingParams = buildRankingParams(idList);
+    @Test
+    public void getRankingsFallbackTest() throws ApiException {
+        stubFor(post(urlEqualTo("/entities/ranking"))
+            .willReturn(aResponse()
+            .withStatus(500)));
+        final String[] idList = {"testing", "fallback"};
+        RankingParams rankingParams = buildRankingParams(idList);
 
-		ensureNoRankingCallsSoFar();
+        ensureNoRankingCallsSoFar();
         RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         //make sure the request actually made it to the server
         verifyRankingCall(idList);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly(idList); //response from fallback
         assertThat(rankings.getCell()).isNull();
-	}
+    }
 
 
-	@Test
-	public void getRankingsBadResponseTest() throws ApiException {
-		stubFor(post(urlEqualTo("/entities/ranking"))
-			.willReturn(aResponse()
-			    .withStatus(200)
-			    .withHeader("Content-Type", "application/json")
-			    .withBodyFile("invalid-json.txt")));
+    @Test
+    public void getRankingsBadResponseTest() throws ApiException {
+        stubFor(post(urlEqualTo("/entities/ranking"))
+            .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("invalid-json.txt")));
 
-		final String[] idList = {"invalid", "json"};
-		RankingParams rankingParams = buildRankingParams(idList);
-		ensureNoRankingCallsSoFar();
+        final String[] idList = {"invalid", "json"};
+        RankingParams rankingParams = buildRankingParams(idList);
+        ensureNoRankingCallsSoFar();
         RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         verifyRankingCall(idList);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly(idList); //response from fallback
         assertThat(rankings.getCell()).isNull();
-	}
+    }
 
-	private RankingParams buildRankingParams(String... idList) {
-		RankingParams rankingParams = new RankingParams();
+    private RankingParams buildRankingParams(String... idList) {
+        RankingParams rankingParams = new RankingParams();
         rankingParams.setAnonymous("anon-id");
         rankingParams.setView("b/mens-pants");
         rankingParams.setEntityType("products");
         rankingParams.setIds(Lists.newArrayList(idList));
         return rankingParams;
-	}
-	
-	private void ensureNoRankingCallsSoFar() {
-		verify(0, postRequestedFor(urlEqualTo("/entities/ranking")));
-	}
+    }
 
-	private void verifyRankingCall(String... idList) {
-		for (String id:idList) { // better way to do this..?
-			verify(postRequestedFor(urlEqualTo("/entities/ranking"))
-        		.withHeader("Content-Type", equalTo("application/json"))
-        		.withRequestBody(containing(id)));
-		}
-	}
-	/** == getRankings tests end == **/
+    private void ensureNoRankingCallsSoFar() {
+        verify(0, postRequestedFor(urlEqualTo("/entities/ranking")));
+    }
+
+    private void verifyRankingCall(String... idList) {
+        for (String id:idList) { // better way to do this..?
+            verify(postRequestedFor(urlEqualTo("/entities/ranking"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Content-Encoding", equalTo("gzip"))
+                .withRequestBody(containing(id)));
+        }
+    }
+    /** == getRankings tests end == **/
 
 }
