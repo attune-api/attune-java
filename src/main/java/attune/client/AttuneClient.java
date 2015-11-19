@@ -1,14 +1,5 @@
 package attune.client;
 
-import attune.client.api.Anonymous;
-import attune.client.api.Entities;
-import attune.client.model.AnonymousResult;
-import attune.client.model.Customer;
-import attune.client.model.RankedEntities;
-import attune.client.model.RankingParams;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -17,8 +8,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import attune.client.api.Anonymous;
+import attune.client.api.Entities;
+import attune.client.model.AnonymousResult;
+import attune.client.model.Customer;
+import attune.client.model.RankedEntities;
+import attune.client.model.RankingParams;
 
 /**
  * Created by sudnya on 5/27/15.
@@ -31,10 +30,17 @@ public class AttuneClient implements RankingClient  {
     private Anonymous anonymous;
     private static AttuneClient instance;
 
+    /**
+     * Get a singleton instance of the {@link AttuneClient}.
+     * @deprecated use {@link #buildWith(AttuneConfigurable)}
+     * @param configurable
+     * @return
+     */
+    @Deprecated
     public static AttuneClient getInstance(AttuneConfigurable configurable) {
         if (instance == null) {
             //double checked locking for thread safe singleton
-            synchronized (AttuneClient.class) {
+        	synchronized (AttuneClient.class) {
                 if (instance == null) {
                     instance = new AttuneClient(configurable);
                 }
@@ -48,6 +54,15 @@ public class AttuneClient implements RankingClient  {
 
         entities           = new Entities(attuneConfigurable);
         anonymous          = new Anonymous(attuneConfigurable);
+    }
+
+    /**
+     * Returns an instance of the client configured based on the provided {@link AttuneConfigurable} instance.
+     * @param config configuration
+     * @return instance of the client
+     */
+    public static AttuneClient buildWith(AttuneConfigurable config) {
+        return new AttuneClient(config);
     }
 
     /**
