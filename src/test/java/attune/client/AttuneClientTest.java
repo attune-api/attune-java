@@ -48,7 +48,7 @@ public class AttuneClientTest {
         System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds*1000L);
 
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         assertNotNull(client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66"));
         System.out.println("PASS: authToken not null");
@@ -64,7 +64,7 @@ public class AttuneClientTest {
         System.out.println("testAnonymousCreate: Sleep for  " + sleepSeconds + " seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
         String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
@@ -85,7 +85,7 @@ public class AttuneClientTest {
         System.out.println("testBind: Sleep for  " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
 
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
         String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
         assertNotNull(authToken);
         System.out.println("PASS: authToken not null");
@@ -107,7 +107,7 @@ public class AttuneClientTest {
     @Test
     public void testGetBoundCustomer() throws Exception {
         long sleepSeconds = 5;
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         System.out.println("testBoundCustomer: Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
         Thread.sleep(sleepSeconds * 1000L);
@@ -151,7 +151,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testBoundToCorrectCustomer() throws Exception {
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(this.authToken);
         assertNotNull(anon);
@@ -176,7 +176,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -220,7 +220,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testGzipGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -239,7 +239,7 @@ public class AttuneClientTest {
 
         rankingParams.setIds(idList);
 
- /*       RankedEntities rankings = client.getRankings(rankingParams, authToken);
+        RankedEntities rankings = client.getRankings(rankingParams, authToken);
 
         assertTrue(rankingParams.getEntitySource().toUpperCase().equals("IDS"));
         System.out.println("Default entity source is ids");
@@ -255,7 +255,7 @@ public class AttuneClientTest {
 
         assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
         System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
-    */}
+    }
 
 
 
@@ -265,7 +265,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testScopeGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
@@ -319,7 +319,7 @@ public class AttuneClientTest {
      *
     @Test
     public void testBatchGetRankings() throws Exception {
-        AttuneClient client = AttuneClient.getInstance(attuneConfig);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);

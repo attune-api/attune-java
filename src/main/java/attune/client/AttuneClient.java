@@ -28,26 +28,7 @@ public class AttuneClient implements RankingClient  {
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
-    private static AttuneClient instance;
 
-    /**
-     * Get a singleton instance of the {@link AttuneClient}.
-     * @deprecated use {@link #buildWith(AttuneConfigurable)}
-     * @param configurable
-     * @return
-     */
-    @Deprecated
-    public static AttuneClient getInstance(AttuneConfigurable configurable) {
-        if (instance == null) {
-            //double checked locking for thread safe singleton
-        	synchronized (AttuneClient.class) {
-                if (instance == null) {
-                    instance = new AttuneClient(configurable);
-                }
-            }
-        }
-        return instance;
-    }
 
     private AttuneClient(AttuneConfigurable configurable) {
         attuneConfigurable = configurable;
