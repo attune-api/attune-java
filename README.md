@@ -116,7 +116,7 @@ attune.client.Attune is currently configured by {initial, runtime configuration 
 ```
 There are multiple constructors to set the above parameters via the AttuneConfigurable object:
 
-``java
+```java
   AttuneConfigurable();
   
   AttuneConfigurable(String endpoint);
