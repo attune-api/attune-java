@@ -267,6 +267,7 @@ public class ApiInvoker {
       connectionManager.setDefaultMaxPerRoute(attuneConfig.getMaxConnections());
 
       clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+
       return clientConfig;
     }
 
@@ -279,6 +280,8 @@ public class ApiInvoker {
                     Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
                     //if(isDebug)
                     //  client.addFilter(new LoggingFilter());
+                    client.register(GZipEncoder.class);
+                    client.register(EncodingFilter.class);
                     configInstanceMap.put(initConfig, client);
                 }
             }
