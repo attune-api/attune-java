@@ -1,12 +1,15 @@
 package attune.client;
 
-import com.fasterxml.jackson.databind.JavaType;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.filter.EncodingFilter;
-import org.glassfish.jersey.message.GZipEncoder;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -15,15 +18,19 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status.Family;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.filter.EncodingFilter;
+import org.glassfish.jersey.message.GZipEncoder;
+
+import com.fasterxml.jackson.databind.JavaType;
 
 
 public class ApiInvoker {
@@ -186,10 +193,10 @@ public class ApiInvoker {
         String target      = attuneConfig.getEndpoint() + path + querystring;
         Builder builder    = getBuilderWithCorrectHeader(client, headerParams, target);
 
-        boolean gzipOn = "gzip".equals(headerParams.get(HttpHeaders.CONTENT_ENCODING)) ? true : false;
-        if (gzipOn) {
-            builder.acceptEncoding("gzip");
-        }
+//        boolean gzipOn = "gzip".equals(headerParams.get(HttpHeaders.CONTENT_ENCODING)) ? true : false;
+//        if (gzipOn) {
+//            builder.acceptEncoding("gzip");
+//        }
         // categorize request into GET, PUT, POST and accordingly do varying things
         String retVal       = null;
         Response response   = null;
@@ -237,19 +244,20 @@ public class ApiInvoker {
                     retVal = "";
                 }
             } else if (response.getStatusInfo().getFamily() == Family.CLIENT_ERROR) {
-                throw new ApiException(response.getStatus(), " Client error occurred");
+                throw new ApiException(response.getStatus(), "Client error occurred "+ response.getStatus());
             } else if (response.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
-                throw new ApiException(response.getStatus(), "Server error occurred");
+            	throw new ApiException(response.getStatus(), "Server error occurred "+ response.getStatus());
             }
         } catch (ProcessingException p) {
-            throw new ApiException(response.getStatus(), p.getMessage());
+        	int i = (response != null)?response.getStatus():Status.GATEWAY_TIMEOUT.getStatusCode();
+            throw new ApiException(i, p.getMessage());
         } catch (WebApplicationException w) {
             throw new ApiException(response.getStatus(), w.getMessage());
         } finally {
             if (response != null)
                 response.close();
-            return retVal;
         }
+        return retVal;
     }
 
     private Double convertToMilliseconds(Double seconds) {
@@ -262,11 +270,14 @@ public class ApiInvoker {
       clientConfig.property(ClientProperties.READ_TIMEOUT, convertToMilliseconds(attuneConfig.getReadTimeout()).intValue());
       clientConfig.property(ClientProperties.CONNECT_TIMEOUT, convertToMilliseconds(attuneConfig.getConnectionTimeout()).intValue());
 
-      PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
-      connectionManager.setMaxTotal(attuneConfig.getMaxPossiblePoolingConnections());
-      connectionManager.setDefaultMaxPerRoute(attuneConfig.getMaxConnections());
+      PoolingHttpClientConnectionManager c = new PoolingHttpClientConnectionManager();
+      c.setMaxTotal(attuneConfig.getMaxPossiblePoolingConnections());
+      c.setDefaultMaxPerRoute(attuneConfig.getMaxConnections());
 
-      clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+      clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, c);
+      if (attuneConfig.isEnableCompression()) {
+    	  clientConfig.property(ClientProperties.USE_ENCODING, "gzip");
+      }
       return clientConfig;
     }
 
@@ -279,6 +290,8 @@ public class ApiInvoker {
                     Client client = ClientBuilder.newClient(getClientConfigWithParams(config));
                     //if(isDebug)
                     //  client.addFilter(new LoggingFilter());
+                    client.register(GZipEncoder.class);
+                    client.register(EncodingFilter.class);
                     configInstanceMap.put(initConfig, client);
                 }
             }

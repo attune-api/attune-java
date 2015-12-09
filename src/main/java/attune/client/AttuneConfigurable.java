@@ -1,22 +1,26 @@
 package attune.client;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Created by sudnya on 5/27/15.
  */
 public class AttuneConfigurable {
-    private String endpoint                       = "http://localhost";
-    private double readTimeout                    = 0.25;
-    private double connectionTimeout              = 0.50;
-    private int maxPossiblePoolingConnections     = 1000;
-    private int maxConnections                    = 200;
-    private boolean testMode                      = false;
-    private boolean fallBackToDefault             = false;
+    private final String defaulEndpoint                       = "http://localhost";
+    private final double readTimeout                    = 0.25;
+    private final double connectionTimeout              = 0.50;
+    private final int maxPossiblePoolingConnections     = 1000;
+    private final int maxConnections                    = 200;
+    private final boolean testMode                      = false;
+    private final boolean fallBackToDefault             = false;
+    private int retryCount                              = 1; // retry once by default
+    private boolean enableCompression                   = true;
 
     private final InitConfig initConfig;
-    private RuntimeConfig runtimeConfig;
+    private final RuntimeConfig runtimeConfig;
 
     public AttuneConfigurable() {
-        this.initConfig     = new InitConfig(endpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.initConfig     = new InitConfig(defaulEndpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
@@ -89,4 +93,21 @@ public class AttuneConfigurable {
     public void updateFallbackToDefaultMode(boolean fallBackToDefault) {
         this.runtimeConfig.setFallBackToDefault(fallBackToDefault);
     }
+
+    public void setRetryCount(int i) {
+    	Preconditions.checkArgument(i > -1 && i < 20);
+    	this.retryCount = i;
+    }
+
+    public int getRetryCount() {
+    	return this.retryCount;
+    }
+
+    public void setEnableCompression(boolean enable) {
+    	this.enableCompression = enable;
+    }
+
+    public boolean isEnableCompression() {
+		return this.enableCompression;
+	}
 }

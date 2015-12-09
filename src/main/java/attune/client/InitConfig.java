@@ -1,5 +1,10 @@
 package attune.client;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import jersey.repackaged.com.google.common.base.Preconditions;
+
 /**
  * Created by sudnya on 8/25/15.
  */
@@ -11,6 +16,12 @@ public class InitConfig {
     private double connectionTimeout;
 
     public InitConfig(String endpoint, int maxPossiblePoolingConnections, int maxConnections, double readTimeout, double connectionTimeout) {
+    	Preconditions.checkArgument(isValidUrl(endpoint), "endpoint not a valid url [%s]", endpoint);
+    	Preconditions.checkArgument(maxPossiblePoolingConnections > 0, "maxPossiblePoolingConnections cannot be negative [%s]", maxPossiblePoolingConnections);
+    	Preconditions.checkArgument(maxConnections > 0, "maxConnections cannot be negative [%s]", maxConnections);
+    	Preconditions.checkArgument(readTimeout > 0, "readTimeout cannot be negative [%s]", readTimeout);
+    	Preconditions.checkArgument(connectionTimeout > 0, "connectionTimeout cannot be negative [%s]", connectionTimeout);
+
         this.endpoint                      = endpoint;
         this.maxPossiblePoolingConnections = maxPossiblePoolingConnections;
         this.maxConnections                = maxConnections;
@@ -44,6 +55,17 @@ public class InitConfig {
 
     public void setConnectionTimeout(double connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
+    }
+
+    private boolean isValidUrl(String u) {
+    	boolean valid;
+    	try {
+			new URL(u);
+			valid = true;
+		} catch (MalformedURLException e) {
+			valid = false;
+		}
+    	return valid;
     }
 
     @Override

@@ -1,16 +1,33 @@
 package attune.client.api;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.core.HttpHeaders;
+
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+
 import attune.client.ApiException;
 import attune.client.ApiInvoker;
 import attune.client.AttuneConfigurable;
 import attune.client.Version;
-import attune.client.model.*;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-
-import javax.ws.rs.core.HttpHeaders;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import attune.client.model.BatchRankingRequest;
+import attune.client.model.BatchRankingResult;
+import attune.client.model.Blacklist;
+import attune.client.model.BlacklistDeleteResponse;
+import attune.client.model.BlacklistGetResponse;
+import attune.client.model.BlacklistParams;
+import attune.client.model.BlacklistSaveResponse;
+import attune.client.model.BlacklistUpdateResponse;
+import attune.client.model.RankedEntities;
+import attune.client.model.RankingParams;
 
 /**
  * Created by sudnya on 5/26/15.
@@ -46,7 +63,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
+        //headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
             modifiedParams.setIds(null);
@@ -61,14 +78,18 @@ public class Entities {
 
         if(contentType.startsWith("multipart/form-data")) {
             boolean hasFields = false;
-            FormDataMultiPart mp = new FormDataMultiPart();
+            try (FormDataMultiPart mp = new FormDataMultiPart()) {
 
             if(hasFields)
                 body = mp;
+            } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
 
         try {
-            String response = apiInvoker.invokeAPI(attuneConfig, path, method, queryParams, body, headerParams, contentType, Version.clientVersion);
+        	String response = apiInvoker.invokeAPI(attuneConfig, path, method, queryParams, body, headerParams, contentType, Version.clientVersion);
             if(response != null) {
                 return (RankedEntities) ApiInvoker.deserialize(response, "", RankedEntities.class);
             } else {
@@ -98,7 +119,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
+        //headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {

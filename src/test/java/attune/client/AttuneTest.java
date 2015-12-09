@@ -27,7 +27,7 @@ public class AttuneTest {
 
 
     /**
-     * Method: test MockClient is instantiated when testMode is true
+     * Method: test FallbackClient is instantiated when testMode is true
      * @throws Exception
      */
     @Test
@@ -36,11 +36,11 @@ public class AttuneTest {
         Attune attune        = new Attune(isTestMode);
         RankingClient client = attune.getAttuneClient();
 
-        assertTrue(client instanceof MockClient);
+        assertTrue(client instanceof FallbackClient);
     }
 
     /**
-     * Method: test MockClient is instantiated when testMode is false
+     * Method: test FallbackClient is instantiated when testMode is false
      * @throws Exception
      */
     @Test
