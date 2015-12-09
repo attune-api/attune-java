@@ -82,7 +82,9 @@ public class AttuneClient implements RankingClient  {
 	    	}
     		ConfigurationManager.install(dynamicConfig);            
     	}
+
     }
+
 
     /**
      * Overrides the default value of the fallBackToDefault mode
@@ -272,14 +274,14 @@ public class AttuneClient implements RankingClient  {
         return rankedEntityList;
     }
 */
-    //TODO: this is for junit test purpose only, hence don't generate javadoc
+
+  //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;
     }
 
-
     public static AttuneClient buildWith(AttuneConfigurable config) {
-    	return new AttuneClient(config);
+        return new AttuneClient(config);
     }
 
     private int getNumTries() {

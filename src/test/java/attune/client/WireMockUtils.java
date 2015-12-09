@@ -54,6 +54,8 @@ public class WireMockUtils {
 		
 	};
 
+	public static final Condition<Throwable> codeBadRequest = new ApiExceptionCodeCondition(Status.BAD_REQUEST);
+
 	public static final Condition<Throwable> code404 = new ApiExceptionCodeCondition(Status.NOT_FOUND);
 
 	public static final Condition<Throwable> codeInternalServerError = new ApiExceptionCodeCondition(Status.INTERNAL_SERVER_ERROR);

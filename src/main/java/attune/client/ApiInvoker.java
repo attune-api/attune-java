@@ -116,7 +116,6 @@ public class ApiInvoker {
         if(null != containerType) {
             containerType = containerType.toLowerCase();
         }
-        System.err.println(json);
 
         try {
             if("list".equals(containerType) || "array".equals(containerType)) {
@@ -205,7 +204,6 @@ public class ApiInvoker {
         try {
             //process API request
             if ("GET".equals(method)) {
-            	String s = builder.toString();
                 response = (Response) builder.get(Response.class);
             } else if ("POST".equals(method)) {
                 if (body == null) {

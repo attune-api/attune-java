@@ -23,7 +23,7 @@ public class LoadConfigPropertiesTest {
 
 
     /**
-     * Method: test MockClient is instantiated when testMode is true
+     * Method: test FallbackClient is instantiated when testMode is true
      * @throws Exception
      */
     @Test

@@ -8,14 +8,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * MockClient Tester.
+ * FallbackClient Tester.
  *
  * @author <sudnya>
  * @since <pre>June 2, 2015</pre>
  * @version 1.0
  */
 
-public class MockClientTest {
+public class FallbackClientTest {
 
     @Before
     public void before() throws Exception {
@@ -32,8 +32,8 @@ public class MockClientTest {
      */
     @Test
     public void testCreateAnonymousFromMock() throws Exception {
-        MockClient mockClient = new MockClient();
-        assertNotNull(mockClient.createAnonymous(""));
+        FallbackClient fallbackClient = new FallbackClient();
+        assertNotNull(fallbackClient.createAnonymous(""));
     }
 
 
@@ -43,8 +43,8 @@ public class MockClientTest {
      */
     @Test
     public void testBindFromMock() throws Exception {
-        MockClient mockClient = new MockClient();
-        mockClient.bind("", "", "");
+        FallbackClient fallbackClient = new FallbackClient();
+        fallbackClient.bind("", "", "");
     }
 
 
@@ -54,8 +54,8 @@ public class MockClientTest {
      */
     @Test
     public void testBoundCustomerFromMock() throws Exception {
-        MockClient mockClient = new MockClient();
-        assertNotNull(mockClient.getBoundCustomer("", ""));
+        FallbackClient fallbackClient = new FallbackClient();
+        assertNotNull(fallbackClient.getBoundCustomer("", ""));
     }
 
 
@@ -65,7 +65,7 @@ public class MockClientTest {
      */
     @Test
     public void testGetRankingsFromMock() throws Exception {
-        MockClient mockClient = new MockClient();
-        assertNotNull(mockClient.getRankings(new RankingParams(), ""));
+        FallbackClient fallbackClient = new FallbackClient();
+        assertNotNull(fallbackClient.getRankings(new RankingParams(), ""));
     }
 }

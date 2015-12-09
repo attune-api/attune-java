@@ -12,7 +12,7 @@ public class Attune {
         if (!testMode) {
             attuneClient = AttuneClient.getInstance(new AttuneConfigurable());
         } else {
-            attuneClient = new MockClient();
+            attuneClient = new FallbackClient();
         }
     }
 

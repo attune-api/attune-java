@@ -32,22 +32,23 @@ public class WiremockTest {
 	public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089).httpsPort(8443));
 	private static final String URL_PATH_RANKING = "/entities/ranking";
 
-	@Test
-	public void bindTest() {
-		stubFor(get(urlPathMatching("/anonymous/.*"))
+
+    @Test
+    public void bindTest() {
+        stubFor(get(urlPathMatching("/anonymous/.*"))
             .withHeader("Accept", equalTo("application/json"))
             .willReturn(aResponse()
             .withStatus(200)
             .withHeader("Content-Type", "text/xml")
             .withBody("<response>Some content</response>")));
 
-	
-	}
+    }
 
-	private String authToken;
-	private AttuneConfigurable attuneConfig;
-	private AttuneClient attuneClient;
-	@Before
+    private String authToken;
+    private AttuneConfigurable attuneConfig;
+    private AttuneClient attuneClient;
+
+    @Before
     public void before() throws Exception {
         this.authToken  = "some-auth-token";
         this.attuneConfig = new AttuneConfigurable("http://localhost:8089", 1000, 200, 1.0d, 1.0d);
@@ -76,7 +77,8 @@ public class WiremockTest {
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly("some","valid","values","from","mock","server");
         assertThat(rankings.getCell()).isEqualTo("wiremocktest-postive");
-	}
+    }
+
 
 	@Test
 	public void getRankingsNotFoundTest() throws ApiException {
@@ -103,14 +105,14 @@ public class WiremockTest {
 		final String[] idList = {"testing", "fallback"};
 		RankingParams rankingParams = buildRankingParams(idList);
 
-		ensureNoRankingCallsSoFar();
+        ensureNoRankingCallsSoFar();
         RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         //make sure the request actually made it to the server
         verifyRankingCall(idList);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly(idList); //response from fallback
         assertThat(rankings.getCell()).isNull();
-	}
+    }
 
 	@Test
 	public void getBreakerNoOpenErrorTest() throws ApiException {
@@ -180,26 +182,26 @@ public class WiremockTest {
 		assertThat(rankings.getRanking()).containsOnly(finalValues);
 	}
 
-	@Test
-	public void getRankingsBadResponseTest() throws ApiException {
-		stubFor(post(urlEqualTo(URL_PATH_RANKING))
-			.willReturn(aResponse()
-			    .withStatus(200)
-			    .withHeader("Content-Type", "application/json")
-			    .withBodyFile("invalid-json.txt")));
+    @Test
+    public void getRankingsBadResponseTest() throws ApiException {
+        stubFor(post(urlEqualTo("/entities/ranking"))
+            .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("invalid-json.txt")));
 
-		final String[] idList = {"invalid", "json"};
-		RankingParams rankingParams = buildRankingParams(idList);
-		//ensureNoRankingCallsSoFar();
+        final String[] idList = {"invalid", "json"};
+        RankingParams rankingParams = buildRankingParams(idList);
+        ensureNoRankingCallsSoFar();
         RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
         verifyRankingCall(idList);
         assertThat(rankings).isNotNull();
         assertThat(rankings.getRanking()).containsOnly(idList); //response from fallback
         assertThat(rankings.getCell()).isNull();
-	}
+    }
 
-	private RankingParams buildRankingParams(String... idList) {
-		RankingParams rankingParams = new RankingParams();
+    private RankingParams buildRankingParams(String... idList) {
+        RankingParams rankingParams = new RankingParams();
         rankingParams.setAnonymous("anon-id");
         rankingParams.setView("b/mens-pants");
         rankingParams.setEntityType("products");
@@ -268,5 +270,6 @@ public class WiremockTest {
         WireMock.resetAllRequests();
 	}
 	/** == getRankings tests end == **/
+
 
 }

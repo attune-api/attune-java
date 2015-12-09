@@ -1,6 +1,7 @@
 package attune.client;
 
 import static attune.client.WireMockUtils.code404;
+import static attune.client.WireMockUtils.codeBadRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -97,7 +98,7 @@ public class GetRankings_NoFallbackTest {
 			attuneClient.getRankings(rankingParams, authToken);
 	        failBecauseExceptionWasNotThrown(ApiException.class);
         } catch(ApiException e) {
-        	assertThat(e).has(code404);
+        	assertThat(e).has(codeBadRequest);
         }
 	}
 
