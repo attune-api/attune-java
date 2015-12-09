@@ -1,12 +1,16 @@
 package attune.client.api;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.core.HttpHeaders;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
@@ -24,10 +28,6 @@ import attune.client.model.BlacklistSaveResponse;
 import attune.client.model.BlacklistUpdateResponse;
 import attune.client.model.RankedEntities;
 import attune.client.model.RankingParams;
-
-import javax.ws.rs.core.HttpHeaders;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Created by sudnya on 5/26/15.
@@ -63,7 +63,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
+        //headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (params.getEntitySource().toUpperCase().equals("SCOPE")) {
             modifiedParams.setIds(null);
@@ -119,7 +119,7 @@ public class Entities {
         Map<String, String> headerParams = new HashMap<String, String>();
 
         headerParams.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
+        //headerParams.put(HttpHeaders.CONTENT_ENCODING, "gzip");
 
         if (method.equals("GET")) {
             for (RankingParams params : modifiedBatchRequest.getRequests()) {

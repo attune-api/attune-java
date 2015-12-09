@@ -75,6 +75,7 @@ public class Anonymous {
                 throw new ApiException(503, "Create anonymous response returned = null");
             }
         } catch (ApiException ex) {
+        	ex.printStackTrace();
             throw new ApiException(ex.getCode(), "Exception in creating auth token");
         }
     }

@@ -14,6 +14,10 @@ public class HystrixConfig {
 
 	public static final String HYSTRIX_GROUP_NAME = "attune-client";
 	private final Map<String, Object> params;
+	static final String propertyNameStub = "hystrix.command.";// + HYSTRIX_GROUP_NAME;
+	public static final String PROPERTY_NAME_HYSTRIX_FALLBACK_ENABLE = propertyNameStub + ".fallback.enabled";
+	static final String[] HYSTRIX_COMMANDS = {"BindHystrixCommand", "CreateAnonymousHystrixCommand", 
+			"GetBoundCustomerHystrixCommand", "GetRankingsHystrixCommand", "GetRankingsGETHystrixCommand"};
 
 	private HystrixConfig(Map<String, Object> params) {
 		this.params = params;
@@ -29,18 +33,20 @@ public class HystrixConfig {
 
 	public static final class Builder {
 		private final Map<String, Object> configParams;
-		final String propertyNameStub = "hystrix.command." + HYSTRIX_GROUP_NAME;
 
 		public Builder() {
 			configParams = Maps.newHashMap();
-			configParams.put(propertyNameStub + ".execution.isolation.strategy", "THREAD");
-			configParams.put(propertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", 1000);
-			configParams.put(propertyNameStub + ".fallback.enabled", Boolean.TRUE);
+			for (String cmdKey:HYSTRIX_COMMANDS) {
+				String cmdPropertyNameStub = propertyNameStub + cmdKey;
+				configParams.put(cmdPropertyNameStub + ".execution.isolation.strategy", "THREAD");
+				configParams.put(cmdPropertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", 100000);
+				configParams.put(cmdPropertyNameStub + ".fallback.enabled", Boolean.TRUE);
+				configParams.put(cmdPropertyNameStub + ".circuitBreaker.enabled", Boolean.TRUE);
+				configParams.put(cmdPropertyNameStub + ".circuitBreaker.errorThresholdPercentage", 50);
+				configParams.put(cmdPropertyNameStub + ".circuitBreaker.requestVolumeThreshold", 20);
+				configParams.put(cmdPropertyNameStub + ".circuitBreaker.sleepWindowInMilliseconds", 5000);
+			}
 			configParams.put("hystrix.threadpool." + HYSTRIX_GROUP_NAME + ".coreSize", 10);
-			configParams.put(propertyNameStub + ".circuitBreaker.enabled", Boolean.TRUE);
-			configParams.put(propertyNameStub + ".circuitBreaker.errorThresholdPercentage", 50);
-			configParams.put(propertyNameStub + ".circuitBreaker.requestVolumeThreshold", 20);
-			configParams.put(propertyNameStub + ".circuitBreaker.sleepWindowInMilliseconds", 5000);
 		}
 
 		/**
@@ -48,7 +54,10 @@ public class HystrixConfig {
 		 * @return
 		 */
 		public Builder enableFallback() {
-			configParams.put(propertyNameStub + ".fallback.enabled", Boolean.TRUE);
+			for (String cmdKey:HYSTRIX_COMMANDS) {
+				String cmdPropertyNameStub = propertyNameStub + cmdKey;
+				configParams.put(cmdPropertyNameStub + ".fallback.enabled", Boolean.TRUE);
+			}
 			return this;
 		}
 
@@ -57,7 +66,10 @@ public class HystrixConfig {
 		 * @return
 		 */
 		public Builder disableFallback() {
-			configParams.put(propertyNameStub + ".fallback.enabled", Boolean.FALSE);
+			for (String cmdKey:HYSTRIX_COMMANDS) {
+				String cmdPropertyNameStub = propertyNameStub + cmdKey;
+				configParams.put(cmdPropertyNameStub + ".fallback.enabled", Boolean.FALSE);
+			}
 			return this;
 		}
 
@@ -68,12 +80,15 @@ public class HystrixConfig {
 		 * @return
 		 */
 		public Builder threadPoolSize(int size) {
-			configParams.put(propertyNameStub + ".coreSize", size);
+			configParams.put("hystrix.threadpool." + HYSTRIX_GROUP_NAME + ".coreSize", 10);
 			return this;	
 		}
 
 		public Builder withTimeoutInMilliseconds(int timeout) {
-			configParams.put(propertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", timeout);
+			for(String cmdKey:HYSTRIX_COMMANDS) {
+				String cmdPropertyNameStub = propertyNameStub + cmdKey;
+				configParams.put(cmdPropertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", timeout);
+			}
 			return this;
 		}
 

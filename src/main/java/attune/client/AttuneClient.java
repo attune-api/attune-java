@@ -2,6 +2,7 @@ package attune.client;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -11,9 +12,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import attune.client.hystrix.CreateAnonymousHystrixCommand;
-import attune.client.hystrix.GetBoundCustomerHystrixCommand;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -23,7 +23,11 @@ import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import attune.client.api.Anonymous;
 import attune.client.api.Entities;
+import attune.client.hystrix.BaseApiHystrixCommand;
 import attune.client.hystrix.BindHystrixCommand;
+import attune.client.hystrix.CreateAnonymousHystrixCommand;
+import attune.client.hystrix.GetBoundCustomerHystrixCommand;
+import attune.client.hystrix.GetRankingsGETHystrixCommand;
 import attune.client.hystrix.GetRankingsHystrixCommand;
 import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
@@ -34,7 +38,6 @@ import attune.client.model.RankingParams;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneClient implements RankingClient  {
-    public static final int MAX_RETRIES = 1;
 
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
@@ -62,6 +65,7 @@ public class AttuneClient implements RankingClient  {
         initializeHystrixConfig(configurable);
     }
 
+    private DynamicConfiguration dynamicConfig;
     private void initializeHystrixConfig(AttuneConfigurable configurable) {
     	if (!ConfigurationManager.isConfigurationInstalled()) {
 	    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
@@ -70,13 +74,13 @@ public class AttuneClient implements RankingClient  {
 	
 	    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
 	
-	        DynamicConfiguration dynamicConfig     = new DynamicConfiguration();
+	        dynamicConfig     = new DynamicConfiguration();
 	        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
 	
 	    	for (Map.Entry<String, Object> entry : entries) {
 	    		dynamicConfig.addProperty(entry.getKey(), entry.getValue());
 	    	}
-    		ConfigurationManager.install(dynamicConfig);
+    		ConfigurationManager.install(dynamicConfig);            
     	}
     }
 
@@ -86,7 +90,24 @@ public class AttuneClient implements RankingClient  {
      * @param defaultFallBack
      */
     public void updateFallBackToDefault(boolean defaultFallBack) {
+    	for (String cmdKey:HystrixConfig.HYSTRIX_COMMANDS) {
+    		String cmdPropertyNameStub = HystrixConfig.propertyNameStub + cmdKey;
+    		dynamicConfig.setProperty(cmdPropertyNameStub + ".fallback.enabled", defaultFallBack);
+    	}
         attuneConfigurable.updateFallbackToDefaultMode(defaultFallBack);
+    }
+
+    /**
+     * Overrides the default value of the fallBackToDefault mode
+     * @author sudnya
+     * @param defaultFallBack
+     */
+    public void updateTimeout(int timeoutMillis) {
+    	for (String cmdKey:HystrixConfig.HYSTRIX_COMMANDS) {
+    		String cmdPropertyNameStub = HystrixConfig.propertyNameStub + cmdKey;
+    		dynamicConfig.setProperty(cmdPropertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", timeoutMillis);
+    	}
+        //attuneConfigurable.updateFallbackToDefaultMode(timeoutMillis);
     }
 
     /**
@@ -125,7 +146,7 @@ public class AttuneClient implements RankingClient  {
                 break;
             } catch (JSONException e) {
                 ++counter;
-                if (counter > MAX_RETRIES) {
+                if (counter > getNumTries()) {
                     throw new ApiException();
                 }
             }
@@ -141,21 +162,7 @@ public class AttuneClient implements RankingClient  {
      * @return An AnonymousResult object, do a getId on this object to get anonymousId
      */
     public AnonymousResult createAnonymous(String authToken) throws ApiException {
-        int counter = 0;
-        AnonymousResult retVal;
-
-        while (true) {
-            try {
-                new CreateAnonymousHystrixCommand(anonymous, authToken).execute();
-                retVal = anonymous.create(authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        AnonymousResult retVal = executeCommand(new CreateAnonymousHystrixCommand(anonymous, authToken, getNumTries()));
         return retVal;
     }
 
@@ -167,21 +174,9 @@ public class AttuneClient implements RankingClient  {
      * @param authToken authentication token
      */
     public void bind(String anonymousId, String customerId, String authToken) throws ApiException {
-        int counter = 0;
         Customer customer = new Customer();
         customer.setCustomer(customerId);
-        while (true) {
-            try {
-            	new BindHystrixCommand(anonymous, anonymousId, customer, authToken).execute();
-                anonymous.update(anonymousId, customer, authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        executeCommand(new BindHystrixCommand(anonymous, anonymousId, customer, authToken, getNumTries()));
     }
 
 
@@ -193,21 +188,7 @@ public class AttuneClient implements RankingClient  {
      * @return A customer that was associated to this anonymousId with a bind call
      */
     public Customer getBoundCustomer(String anonymousId, String authToken) throws ApiException {
-        int counter = 0;
-        Customer retVal;
-
-        while (true) {
-            try {
-                new GetBoundCustomerHystrixCommand(anonymous, anonymousId, authToken);
-                retVal = anonymous.get(anonymousId, authToken);
-                break;
-            } catch (ApiException ex) {
-                ++counter;
-                if (counter > MAX_RETRIES) {
-                    throw ex;
-                }
-            }
-        }
+        Customer retVal = executeCommand(new GetBoundCustomerHystrixCommand(anonymous, anonymousId, authToken, getNumTries()));
         return retVal;
     }
 
@@ -218,10 +199,37 @@ public class AttuneClient implements RankingClient  {
      * @param authToken authentication token
      */
     public RankedEntities getRankings(RankingParams rankingParams, String authToken) throws ApiException {
-        RankedEntities retVal = new GetRankingsHystrixCommand(entities, rankingParams, authToken).execute();
-        return retVal;
+    	GetRankingsGETHystrixCommand getRankingsHystrixCommand;
+    	if (rankingParams.getEntitySource().toUpperCase().equals("IDS")) {
+    		getRankingsHystrixCommand = new GetRankingsHystrixCommand(entities, rankingParams, authToken, getNumTries());
+    	} else {
+    		getRankingsHystrixCommand = new GetRankingsGETHystrixCommand(entities, rankingParams, authToken, getNumTries());
+    	}
+    	return executeCommand(getRankingsHystrixCommand);
     }
 
+    private <T> T executeCommand(BaseApiHystrixCommand<T> cmd) throws ApiException {
+    	try {
+    		T retVal = cmd.execute();
+    		return retVal;
+    	} catch(HystrixRuntimeException e) {
+    		throw unwrap(e);
+    	}
+    }
+
+    private ApiException unwrap(HystrixRuntimeException e) {
+    	ApiException ex;
+    	if (e.getCause() instanceof ApiException) {
+    		ex = (ApiException) e.getCause();
+    	} else {
+    		if (e.getCause() instanceof TimeoutException) {
+    			ex = new ApiException(Status.GATEWAY_TIMEOUT.getStatusCode(), e.getCause());
+    		} else {
+    			ex = new ApiException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), e.getCause());
+    		}
+    	}
+    	return ex;
+    }
 
     /**
      * Returns a list of rankings of the given list of specified entities, given an auth token
@@ -272,5 +280,9 @@ public class AttuneClient implements RankingClient  {
 
     public static AttuneClient buildWith(AttuneConfigurable config) {
     	return new AttuneClient(config);
+    }
+
+    private int getNumTries() {
+    	return 1 + this.attuneConfigurable.getRetryCount();
     }
 }
