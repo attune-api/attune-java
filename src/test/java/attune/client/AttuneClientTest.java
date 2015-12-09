@@ -10,10 +10,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.util.concurrent.Uninterruptibles;
 
 import attune.client.model.AnonymousResult;
 import attune.client.model.Customer;
@@ -51,9 +54,7 @@ public class AttuneClientTest {
      */
     @Test
     public void testAuthGetToken() throws Exception {
-        long sleepSeconds = 5;
-        System.out.println("testAuthTokenGet: Sleep for " + sleepSeconds + " seconds to not overwhelm api server with requests");
-        Thread.sleep(sleepSeconds*1000L);
+    	pause("testAuthTokenGet");
 
         AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
@@ -67,7 +68,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testCreateAnonymous() throws Exception {
+    	pause("testAnonymousCreate");
+
         AttuneClient client = AttuneClient.buildWith(attuneConfig);
+        String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        assertNotNull(authToken);
+        System.out.println("PASS: authToken not null");
+
         assertNotNull(client.createAnonymous(authToken));
         System.out.println("PASS: anonymousResult not null");
     }
@@ -79,7 +86,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testBind() throws Exception {
-    	AttuneClient client = AttuneClient.buildWith(attuneConfig);
+    	pause("testBind");
+
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
+        String authToken    = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        assertNotNull(authToken);
+        System.out.println("PASS: authToken not null");
+
         AnonymousResult anonymous = client.createAnonymous(authToken);
         assertNotNull(anonymous);
         System.out.println("PASS: anonymousResult not null");
@@ -96,8 +109,13 @@ public class AttuneClientTest {
      */
     @Test
     public void testGetBoundCustomer() throws Exception {
+    	pause("testBoundCustomer");
         AttuneClient client = AttuneClient.buildWith(attuneConfig);
+        String authToken = client.getAuthToken("attune", "a433de60fe2311e3a3ac0800200c9a66");
+        assertNotNull(authToken);
+        System.out.println("PASS: authToken not null");
 
+        pause("testBoundCustomer");
         AnonymousResult anon = client.createAnonymous(authToken);
         assertNotNull(anon);
         System.out.println("PASS: anonymousResult not null");
@@ -206,15 +224,49 @@ public class AttuneClientTest {
         assertThat(rankingParams).isNotNull();
     }
 
-    @Test
-    public void testScopeGetRankingsOK() throws ApiException {
-    	List<String> idList = withDefaultIdList();
-    	RankedEntities rankings = makeScopeRankingCall("59784", idList);
+    public void testGzipGetRankings() throws Exception {
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
-        assertNotNull(rankings);
-        System.out.println("PASS: rankings not null");
+        AnonymousResult anon = client.createAnonymous(authToken);
+        assertNotNull(anon);
+        System.out.println("PASS: anonymousResult not null");
 
+        RankingParams rankingParams = new RankingParams();
+        rankingParams.setAnonymous(anon.getId());
+        rankingParams.setView("b/mens-pants");
+        rankingParams.setEntityType("products");
+
+        List<String> idList = new ArrayList<String>();
+        idList.add("1001");
+        idList.add("1002");
+        idList.add("1003");
+        idList.add("1004");
+
+        rankingParams.setIds(idList);
+
+        RankedEntities rankings = client.getRankings(rankingParams, authToken);
+
+        assertEquals(idList.size(), rankings.getRanking().size());
+        System.out.println("PASS: size of results rankings equals size of product id list passed in ranking params i.e. " + idList.size());
+
+        client.updateFallBackToDefault(true);
+        RankedEntities defaultList = client.getRankings(rankingParams, authToken);
+
+        assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
+        System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
     }
+
+
+	@Test
+	public void testScopeGetRankingsOK() throws ApiException {
+		List<String> idList = withDefaultIdList();
+		RankedEntities rankings = makeScopeRankingCall("59784", idList);
+	
+	    assertNotNull(rankings);
+	    System.out.println("PASS: rankings not null");
+	}
+
+
 
     private List<String> withDefaultIdList() {
         List<String> idList = new ArrayList<String>();
@@ -255,6 +307,14 @@ public class AttuneClientTest {
       return rankings;
     }
 
+    private final static Boolean PAUSE = Boolean.FALSE;
+    private void pause(String where) {
+    	if (PAUSE) {
+    		long sleepSeconds = 5;
+			System.out.println(where + ": Sleep for " + sleepSeconds + "  seconds to not overwhelm api server with requests");
+			Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
+    	}
+    }
     /**
      * Method: verify that the rankings returned on a batchGetRankings call happened correctly and the size of the list matches the list supplied in the params
      * @throws Exception

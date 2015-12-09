@@ -26,7 +26,7 @@ Copy this jar to the build/libs folder of your project and import it.
 Requests are performed through a AttuneClient object
 ```java
   AttuneConfigurable config = new AttuneConfigurable(endpoint, timeout, clientId, clientSecret);
-  AttuneClient client       = AttuneClient.getInstance(config);
+  AttuneClient client       = AttuneClient.buildWith(config);
   ```
 
 Visitors to the application should be tagged with an anonymous user id
@@ -37,7 +37,7 @@ Visitors to the application should be tagged with an anonymous user id
 
 The user id can be bound to a customer id at login
 ```java
-  AttuneClient client        = AttuneClient.getInstance(config);
+  AttuneClient client        = AttuneClient.buildWith(config);
   String authToken           = attuneClient.getAuthToken();
   AnonymousResult anonoymous = client.createAnonymous(authToken);
   Customer refCustomer       = new Customer();
@@ -45,7 +45,7 @@ The user id can be bound to a customer id at login
   refCustomer.setCustomer("test-customer");
   client.bind(anonymous.getId(), refCustomer.getCustomer(), authToken);
 ```
-The client can then perform rankings. Ranking calls can be either single ranking calls or batched ranking calls.
+The client can then perform rankings. Ranking calls compress the payload.
 
 Here is an example of a single ranking call:
 ```java
@@ -66,72 +66,75 @@ Here is an example of a single ranking call:
   RankedEntities rankings = client.getRankings(rankingParams, authToken);
 ```
 
-Batched ranking calls can be used as follows:
+Ranking calls can set scope as follows:
 ```java
   RankingParams rankingParams = new RankingParams();
   rankingParams.setAnonymous(anon.getId());
-  rankingParams.setView("b/mens-pants");
+  rankingParams.setView("/sales/57460");
+  rankingParams.setEntitySource("scope");
+
+  List<String> scope = new ArrayList<>();
+  scope.add("sale=57460");
+  scope.add("color=red");
+  scope.add("size=M");
+  rankingParams.setScope(scope); //Scope parameter that indicate what IDs to retrieve
+
   rankingParams.setEntityType("products");
-  
+  rankingParams.setApplication("event_page");
+
   List<String> idList = new ArrayList<String>();
   idList.add("1001");
   idList.add("1002");
   idList.add("1003");
   idList.add("1004");
-  
-  rankingParams.setIds(idList);
-  
-  RankingParams rankingParams2 = new RankingParams();
-  rankingParams2.setAnonymous(anon.getId());
-  rankingParams2.setView("sales/99876");
-  rankingParams2.setEntityType("saleEvents");
-  
-  List<String> idList2 = new ArrayList<String>();
-  idList2.add("9991");
-  idList2.add("9992");
-  idList2.add("9993");
-  idList2.add("9994");
-  
-  rankingParams2.setIds(idList2);
-  
-  List<RankingParams> batchRankingParams = new ArrayList<>();
-  batchRankingParams.add(rankingParams);
-  batchRankingParams.add(rankingParams2);
-  
-  List<RankedEntities> batchRankings = client.batchGetRankings(batchRankingParams, authToken);
 
+  rankingParams.setIds(idList);
+
+  RankedEntities rankings = client.getRankings(rankingParams, authToken);
 ```
 
 The client provides a way to request a new auth_token through the API
 ```java
-  AttuneClient client = AttuneClient.getInstance();
-  String authToken    = attuneClient.getAuthToken();
+ AttuneClient client = AttuneClient.buildWith(attuneConfig);
+ client.getAuthToken("consumer-name", "bearer-token");
 ```
 
 ### Configuration
 
-attune.client.Attune is currently configured by setting properties in the config.properties file of the project. Here are the default values:
+attune.client.Attune is currently configured by {initial, runtime configuration properties} in the constructor of the AttuneConfigurable object. Here are the default values:
 ``` java
+  // These are the initial configuration parameters i.e they can be set only once
+  private String endpoint                       = "http://localhost";
+  private double readTimeout                    = 0.25;
+  private double connectionTimeout              = 0.50;
+  private int maxPossiblePoolingConnections     = 1000;
+  private int maxConnections                    = 200;
+  
+  // These parameters can be over ridden at runtime
+  private boolean testMode                      = false;
+  private boolean fallBackToDefault             = false;
+```
+There are multiple constructors to set the above parameters via the AttuneConfigurable object:
 
-end_point=https://api.attune-staging.co
-timeout=5
-client_id=client-id
-client_secret=client-secret
-test_mode=true
+```java
+  AttuneConfigurable();
+  
+  AttuneConfigurable(String endpoint);
+  
+  AttuneConfigurable(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections, Double readTimeout, Double connectionTimeout);
+  
+  AttuneConfigurable(String endpoint, Integer maxPossiblePoolingConnections, Integer maxConnections);
+  
+  AttuneConfigurable(String endpoint, Double readTimeout, Double connectionTimeout);
 ```
 
-To override these values, we have provided API calls. Here is how the properties like end_point, timeout, client_id, client_secret, test_mode can be overridden:
+To override the configuration values at runtime, we have provided API calls. Here is how the testMode and fallBackToDefault parameters can ve changed at runtime:
 ``` java
-  AttuneClient client = AttuneClient.getInstance();
-  client.setEndpoint("http://localhost");
-  client.setTimeout(0.50); //time the client waits on a read connection before timing-out 0.50 = 500 millisec
-  client.setClientId("test-client-id");
-  client.setClientSecret("test-client-secret");
-  client.setDefaultRankingOnError("fallback_to_default") // When there is a server exception, a value of 'true' displays default ranking instead of showing the exception
-  client.setTestMode(true); // no API calls to end point will be made, and rankings will be returned in their original order
+  AttuneClient client = AttuneClient.buildWith(attuneConfig);
+  client.updateFallBackToDefault(true);
+  client.updateTestMode(true); // no API calls to end point will be made, and rankings will be returned in their original order
 ```
-
-Settings can also be overridden by modifying the config.properties file
+The fallback to default mode when true, ensures that the rankings are default in case an exception occurs.
 
 ### Testing
 
@@ -139,13 +142,13 @@ For testing and development, the ranking API can be simulated using.
 
 ``` java
   
-  boolean isTestMode   = true;
-  attune.client.Attune attune        = new attune.client.Attune(isTestMode);
-  RankingClient client = attune.getAttuneClient();
+  boolean isTestMode            = true;
+  attune.client.Attune attune   = new attune.client.Attune(isTestMode);
+  RankingClient client          = attune.getAttuneClient();
   
 ```
 
-In this mode no API calls will be made, and rankings will be returned in their original order.
+In this test mode no API calls will be made, and rankings will be returned in their original order. This mode can be used during integration and should be turned off afterwards.
 
 
 ## Contributing

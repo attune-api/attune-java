@@ -42,20 +42,7 @@ public class AttuneClient implements RankingClient  {
     private AttuneConfigurable attuneConfigurable;
     private Entities entities;
     private Anonymous anonymous;
-    private static AttuneClient instance;
 
-    @Deprecated
-    public static AttuneClient getInstance(AttuneConfigurable configurable) {
-        if (instance == null) {
-            //double checked locking for thread safe singleton
-            synchronized (AttuneClient.class) {
-                if (instance == null) {
-                    instance = new AttuneClient(configurable);
-                }
-            }
-        }
-        return instance;
-    }
 
     private AttuneClient(AttuneConfigurable configurable) {
         attuneConfigurable = configurable;
@@ -65,7 +52,7 @@ public class AttuneClient implements RankingClient  {
         initializeHystrixConfig(configurable);
     }
 
-    private DynamicConfiguration dynamicConfig;
+    private static DynamicConfiguration dynamicConfig;
     private void initializeHystrixConfig(AttuneConfigurable configurable) {
     	if (!ConfigurationManager.isConfigurationInstalled()) {
 	    	HystrixConfig.Builder hystrixConfigBuilder = new HystrixConfig.Builder();
@@ -75,6 +62,7 @@ public class AttuneClient implements RankingClient  {
 	    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
 	
 	        dynamicConfig     = new DynamicConfiguration();
+	        System.out.println(dynamicConfig);
 	        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
 	
 	    	for (Map.Entry<String, Object> entry : entries) {
@@ -82,9 +70,17 @@ public class AttuneClient implements RankingClient  {
 	    	}
     		ConfigurationManager.install(dynamicConfig);            
     	}
-
     }
 
+
+    /**
+     * Returns an instance of the client configured based on the provided {@link AttuneConfigurable} instance.
+     * @param config configuration
+     * @return instance of the client
+     */
+    public static AttuneClient buildWith(AttuneConfigurable config) {
+        return new AttuneClient(config);
+    }
 
     /**
      * Overrides the default value of the fallBackToDefault mode
@@ -278,10 +274,6 @@ public class AttuneClient implements RankingClient  {
   //TODO: this is for junit test purpose only, hence don't generate javadoc
     protected AttuneConfigurable getAttuneConfigurable() {
         return this.attuneConfigurable;
-    }
-
-    public static AttuneClient buildWith(AttuneConfigurable config) {
-        return new AttuneClient(config);
     }
 
     private int getNumTries() {

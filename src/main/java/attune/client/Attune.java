@@ -10,7 +10,7 @@ public class Attune {
     // singleton instance
     public Attune(boolean testMode) {
         if (!testMode) {
-            attuneClient = AttuneClient.getInstance(new AttuneConfigurable());
+            attuneClient = AttuneClient.buildWith(new AttuneConfigurable());
         } else {
             attuneClient = new FallbackClient();
         }
