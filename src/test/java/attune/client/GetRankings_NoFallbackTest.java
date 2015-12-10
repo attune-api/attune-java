@@ -4,6 +4,7 @@ import static attune.client.WireMockUtils.code404;
 import static attune.client.WireMockUtils.codeBadRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -37,10 +38,11 @@ public class GetRankings_NoFallbackTest {
 	@Before
     public void before() throws Exception {
         this.authToken  = "some-auth-token";
-        this.attuneConfig = new AttuneConfigurable("http://localhost:8089", 1000, 200, 123.0d, 10000.0d);
+        this.attuneConfig = new AttuneConfigurable("http://localhost:8089", 1000, 200, 5.0d, 5.0d);
         this.attuneConfig.updateFallbackToDefaultMode(false);
         this.attuneConfig.setEnableCompression(false);
         attuneClient = AttuneClient.buildWith(attuneConfig);
+        attuneClient.updateFallBackToDefault(false);
         WireMock.resetAllRequests();
     }
 
@@ -90,12 +92,18 @@ public class GetRankings_NoFallbackTest {
 			    .withStatus(400)
 			    .withHeader("Content-Type", "application/json")
 			    .withBodyFile("GetRankings-positive.json")));
+		stubFor(get(urlEqualTo(URL_PATH_RANKING))
+				.willReturn(aResponse()
+				    .withStatus(400)
+				    .withHeader("Content-Type", "application/json")
+				    .withBodyFile("GetRankings-positive.json")));
 
 		final String[] idList = {"1001", "1002", "1003", "1004"};
 		RankingParams rankingParams = buildRankingParams(idList);
 		ensureNoRankingCallsSoFar();
         try {
-			attuneClient.getRankings(rankingParams, authToken);
+        	RankedEntities rankings = attuneClient.getRankings(rankingParams, authToken);
+        	System.out.println(rankings.toString());
 	        failBecauseExceptionWasNotThrown(ApiException.class);
         } catch(ApiException e) {
         	assertThat(e).has(codeBadRequest);

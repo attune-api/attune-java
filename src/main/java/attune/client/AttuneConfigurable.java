@@ -90,7 +90,7 @@ public class AttuneConfigurable {
      * @author sudnya
      * @param fallBackToDefault
      */
-    public void updateFallbackToDefaultMode(boolean fallBackToDefault) {
+    void updateFallbackToDefaultMode(boolean fallBackToDefault) {
         this.runtimeConfig.setFallBackToDefault(fallBackToDefault);
     }
 

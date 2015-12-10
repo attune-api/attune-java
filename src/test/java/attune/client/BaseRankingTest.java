@@ -43,7 +43,7 @@ public abstract class BaseRankingTest {
 		retVal.setIds(new ArrayList<String>());
 		retVal.setApplication("mobile_event_page");
 		retVal.setEntityType("products");
-		//retVal.setEntitySource("scope");
+		retVal.setEntitySource("scope");
 		
 		List<String> scopes = new ArrayList<String>();
 	  scopes.add("sale=view");

@@ -62,7 +62,6 @@ public class AttuneClient implements RankingClient  {
 	    	HystrixConfig hystrixConfig = hystrixConfigBuilder.withTimeoutInMilliseconds(new Double(configurable.getReadTimeout() * 1000).intValue()).build();
 	
 	        dynamicConfig     = new DynamicConfiguration();
-	        System.out.println(dynamicConfig);
 	        Set<Map.Entry<String, Object>> entries = hystrixConfig.getParams().entrySet();
 	
 	    	for (Map.Entry<String, Object> entry : entries) {
@@ -105,7 +104,6 @@ public class AttuneClient implements RankingClient  {
     		String cmdPropertyNameStub = HystrixConfig.propertyNameStub + cmdKey;
     		dynamicConfig.setProperty(cmdPropertyNameStub + ".execution.isolation.thread.timeoutInMilliseconds", timeoutMillis);
     	}
-        //attuneConfigurable.updateFallbackToDefaultMode(timeoutMillis);
     }
 
     /**
