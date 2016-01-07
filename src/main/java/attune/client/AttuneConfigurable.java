@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
  * Created by sudnya on 5/27/15.
  */
 public class AttuneConfigurable {
-    private final String defaulEndpoint                       = "http://localhost";
+    private final String defaultEndpoint                       = "http://localhost";
     private final double readTimeout                    = 0.25;
     private final double connectionTimeout              = 0.50;
     private final int maxPossiblePoolingConnections     = 1000;
@@ -20,7 +20,7 @@ public class AttuneConfigurable {
     private final RuntimeConfig runtimeConfig;
 
     public AttuneConfigurable() {
-        this.initConfig     = new InitConfig(defaulEndpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
+        this.initConfig     = new InitConfig(defaultEndpoint, maxPossiblePoolingConnections, maxConnections, readTimeout, connectionTimeout);
         this.runtimeConfig  = new RuntimeConfig(testMode, fallBackToDefault);
     }
 
