@@ -16,7 +16,8 @@ public class AttuneTest {
 
     @Before
     public void before() throws Exception {
-        String endpoint    = "http://api.attune-staging.co";
+        String endpoint    = "http://localhost:8765";
+        //String endpoint    = "http://api.attune-staging.co";
         double readTimeout = 0.50;
         this.config        = new AttuneConfigurable(endpoint);
     }

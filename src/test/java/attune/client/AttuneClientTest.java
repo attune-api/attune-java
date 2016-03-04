@@ -36,11 +36,9 @@ public class AttuneClientTest {
     AttuneConfigurable attuneConfig;
     @Before
     public void before() throws Exception {
-//        this.authToken  = "cf5853d5-413a-4c5e-9d0b-1e7d7ad35911";
-//        this.attuneConfig = new AttuneConfigurable("http://localhost:8765", 5000.0, 10000.0);
-        //this.authToken  = "388dee30-394d-4a85-9e79-d951e5c3e292";
-    	this.authToken = "a12a4e7a-b359-4c4f-aced-582673f2a6d9";
-        this.attuneConfig = new AttuneConfigurable("https://api-test.attune.co", 2000d, 2000d);
+        this.attuneConfig = new AttuneConfigurable("https://api.attune-staging.co", 2000d, 2000d);
+        AttuneClient client = AttuneClient.buildWith(attuneConfig);
+        this.authToken = client.getAuthToken("veu2n74k01", "4ed3df60fc9d11e3a3ac0800200c9a66");
 
     }
 
@@ -56,12 +54,7 @@ public class AttuneClientTest {
     @Test
     public void testAuthGetToken() throws Exception {
     	pause("testAuthTokenGet");
-
-        AttuneClient client = AttuneClient.buildWith(attuneConfig);
-
-        //api-test
-        assertNotNull(client.getAuthToken("veu2n74k01", "4ed3df60fc9d11e3a3ac0800200c9a66"));
-
+        assertNotNull(this.authToken);
         System.out.println("PASS: authToken not null");
     }
 
@@ -192,6 +185,16 @@ public class AttuneClientTest {
 
         assertTrue(idList.get(0).equals(defaultList.getRanking().get(0)));
         System.out.println("PASS: first entry of default (fallback mode on) results matches to those received in the request");
+
+        rankingParams.setCustomer("36a3c31c3e6d065c50b3d80fd9ba39bf");
+
+        RankedEntities r1 = client.getRankings(rankingParams, authToken);
+
+        assertTrue(rankingParams.getEntitySource().toUpperCase().equals("IDS"));
+        System.out.println("Default entity source is ids");
+
+        assertNotNull(r1);
+        System.out.println("PASS: customer 36a3c31c3e6d065c50b3d80fd9ba39bf rankings not null");
     }
 
 
@@ -212,12 +215,14 @@ public class AttuneClientTest {
     	}
     }
 
+    @Test
     public void testScopeGetRankings() throws Exception {
         List<String> idList = withDefaultIdList();
         RankedEntities rankingParams = makeScopeRankingCall("59784", idList);
         assertThat(rankingParams).isNotNull();
     }
 
+    @Test
     public void testGzipGetRankings() throws Exception {
         AttuneClient client = AttuneClient.buildWith(attuneConfig);
 
